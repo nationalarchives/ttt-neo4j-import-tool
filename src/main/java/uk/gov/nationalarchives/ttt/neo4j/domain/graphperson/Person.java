@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.*;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.neo4j.ogm.annotation.Property;
 import org.neo4j.ogm.annotation.Transient;
 import uk.gov.nationalarchives.ttt.neo4j.domain.graphperson.generated.*;
 
@@ -55,7 +56,7 @@ import java.util.Map;
 })
 //@NodeEntity
 //@org.springframework.data.mongodb.core.mapping.Document(collection = "WO_98_Discovery_A")
-public abstract class Person extends Neo4jObject{
+public abstract class Person extends Neo4jObject {
 
     /**
      * general notes / comments
@@ -118,7 +119,6 @@ public abstract class Person extends Neo4jObject{
      * 
      */
     @JsonProperty("hasFamilyNames")
-    @Transient
     private List<HasFamilyName> hasFamilyNames = new ArrayList<HasFamilyName>();
     /**
      * person has forename(s)
@@ -239,6 +239,7 @@ public abstract class Person extends Neo4jObject{
      */
     @JsonProperty("ref")
 //    @GraphId
+    @Property
     private String ref;
     /**
      * date/time person identified
