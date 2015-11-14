@@ -33,7 +33,7 @@ public class TTTNeo4jConfiguration extends Neo4jConfiguration {
     @Bean
     public SessionFactory getSessionFactory() {
         // with domain entity base package(s)
-        return new SessionFactory("uk.gov.nationalarchives.ttt.neo4j.domain.graphperson.generated");
+        return new SessionFactory("uk.gov.nationalarchives.ttt.neo4j.domain.graphperson");
     }
 
     // needed for session in view in web-applications

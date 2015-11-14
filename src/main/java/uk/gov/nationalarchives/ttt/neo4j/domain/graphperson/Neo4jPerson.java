@@ -7,8 +7,8 @@ import org.neo4j.ogm.annotation.NodeEntity;
 public class Neo4jPerson extends Person {
     public Neo4jPerson(Person person) {
         super();
-        this.setHasForeNames(person.getHasForeNames());
-        this.setHasFamilyNames(person.getHasFamilyNames());
+//        this.setHasForeNames(person.getHasForeNames());
+//        this.setHasFamilyNames(person.getHasFamilyNames());
         this.setRef(person.getRef());
     }
 }

@@ -1,7 +1,7 @@
 package uk.gov.nationalarchives.ttt.neo4j.dao.neo4j;
 
 import org.springframework.data.neo4j.repository.GraphRepository;
-import uk.gov.nationalarchives.ttt.neo4j.domain.neo4j.graphperson.Neo4jPerson;
+import uk.gov.nationalarchives.ttt.neo4j.domain.graphperson.Neo4jPerson;
 
 /**
  * Created by jcharlet on 14/11/15.

@@ -1,25 +1,18 @@
 
 package uk.gov.nationalarchives.ttt.neo4j.domain.graphperson;
 
+import com.fasterxml.jackson.annotation.*;
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.apache.commons.lang.builder.ToStringBuilder;
+import org.neo4j.ogm.annotation.Transient;
+import uk.gov.nationalarchives.ttt.neo4j.domain.graphperson.generated.*;
+
+import javax.annotation.Generated;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.annotation.Generated;
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.fasterxml.jackson.annotation.JsonValue;
-import org.apache.commons.lang.builder.EqualsBuilder;
-import org.apache.commons.lang.builder.HashCodeBuilder;
-import org.apache.commons.lang.builder.ToStringBuilder;
-import org.neo4j.ogm.annotation.GraphId;
-import org.neo4j.ogm.annotation.Transient;
-import uk.gov.nationalarchives.ttt.neo4j.domain.graphperson.generated.*;
 
 
 /**
@@ -62,7 +55,7 @@ import uk.gov.nationalarchives.ttt.neo4j.domain.graphperson.generated.*;
 })
 //@NodeEntity
 //@org.springframework.data.mongodb.core.mapping.Document(collection = "WO_98_Discovery_A")
-public class Person {
+public abstract class Person extends Neo4jObject{
 
     /**
      * general notes / comments
@@ -245,7 +238,7 @@ public class Person {
      * 
      */
     @JsonProperty("ref")
-    @GraphId
+//    @GraphId
     private String ref;
     /**
      * date/time person identified
