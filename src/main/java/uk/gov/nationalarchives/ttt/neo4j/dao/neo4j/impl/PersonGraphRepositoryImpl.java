@@ -10,7 +10,9 @@ import uk.gov.nationalarchives.ttt.neo4j.domain.graphperson.Neo4jObject;
 import uk.gov.nationalarchives.ttt.neo4j.domain.graphperson.Neo4jPerson;
 import uk.gov.nationalarchives.ttt.neo4j.domain.graphperson.Person;
 import uk.gov.nationalarchives.ttt.neo4j.domain.graphperson.generated.FamilyName;
+import uk.gov.nationalarchives.ttt.neo4j.domain.graphperson.generated.ForeName;
 import uk.gov.nationalarchives.ttt.neo4j.domain.graphperson.generated.HasFamilyName;
+import uk.gov.nationalarchives.ttt.neo4j.domain.graphperson.generated.HasForeName;
 
 /**
  * Created by jcharlet on 16/11/15.
@@ -36,9 +38,19 @@ public class PersonGraphRepositoryImpl implements CustomPersonGraphRepository{
         neo4jPerson= (Neo4jPerson) saveSingleNode(neo4jPerson);
 
         for (HasFamilyName hasFamilyName : neo4jPerson.getHasFamilyNames()) {
-            FamilyName familyName = getOrCreateFamilyName(hasFamilyName);
+            final FamilyName inputFamilyName = hasFamilyName.getFamilyName();
+            FamilyName familyName = getFromPropertyOrCreateNode(
+                    FamilyName.class, "name", inputFamilyName.getName(), inputFamilyName);
             hasFamilyName.setFamilyName(familyName);
             hasFamilyName.setPerson(neo4jPerson);
+        }
+
+        for (HasForeName hasForeName : neo4jPerson.getHasForeNames()) {
+            final ForeName inputForeName = hasForeName.getForeName();
+            ForeName foreName = getFromPropertyOrCreateNode(
+                    ForeName.class, "name", inputForeName.getName(), inputForeName);
+            hasForeName.setForeName(foreName);
+            hasForeName.setPerson(neo4jPerson);
         }
         neo4jPerson=(Neo4jPerson)saveNodeAndItsRelationships(neo4jPerson,1);
         return neo4jPerson;
@@ -52,29 +64,28 @@ public class PersonGraphRepositoryImpl implements CustomPersonGraphRepository{
         return neo4jTemplate.save(neo4jObject,depth);
     }
 
-    private FamilyName getOrCreateFamilyName(HasFamilyName hasFamilyName) {
-        FamilyName familyName;
-        final FamilyName initialFamilyName = hasFamilyName.getFamilyName();
+    private <T extends Neo4jObject> T getFromPropertyOrCreateNode(Class<T> inputNodeClass,String property, String value, T inputNode) {
+        T outputNode;
 
-        final String name = initialFamilyName.getName();
-        FamilyName retrievedFamilyName = findFamilyNameNodeByName(name);
+        T retrievedNode = findUniqueNodeByTypeAndProperty(inputNodeClass, property, value);
 
-        if (retrievedFamilyName==null){
-            familyName=neo4jTemplate.save(initialFamilyName, 0);
+        if (retrievedNode==null){
+            outputNode= (T) saveSingleNode(inputNode);
         }else{
-            familyName=retrievedFamilyName;
+            outputNode=retrievedNode;
         }
-        return familyName;
+        return outputNode;
     }
 
-    private FamilyName findFamilyNameNodeByName(String familyNameName) {
-        FamilyName retrievedFamilyName = null;
+    private <T extends Neo4jObject> T findUniqueNodeByTypeAndProperty(Class<T> nodeClass, String property, String value) {
+        T node = null;
         try {
-            retrievedFamilyName = neo4jTemplate.loadByProperty(FamilyName.class, "name", familyNameName);
+            node = neo4jTemplate.loadByProperty(nodeClass, property, value);
         } catch (Exception e) {
             logger.debug("element not found");
         }
-        return retrievedFamilyName;
+        return node;
     }
+
 
 }

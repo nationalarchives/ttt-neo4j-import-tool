@@ -13,6 +13,12 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.neo4j.ogm.annotation.EndNode;
+import org.neo4j.ogm.annotation.RelationshipEntity;
+import org.neo4j.ogm.annotation.StartNode;
+import org.neo4j.ogm.annotation.Transient;
+import uk.gov.nationalarchives.ttt.neo4j.domain.graphperson.Neo4jObject;
+import uk.gov.nationalarchives.ttt.neo4j.domain.graphperson.Neo4jPerson;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Generated("org.jsonschema2pojo")
@@ -26,31 +32,40 @@ import org.apache.commons.lang.builder.ToStringBuilder;
     "preference",
     "foreName"
 })
-public class HasForeName {
+@RelationshipEntity(type="HAS_FORE_NAME")
+public class HasForeName extends Neo4jObject {
+
+    @JsonIgnore
+    @StartNode
+    private Neo4jPerson person;
 
     /**
      * general notes / comments
      * 
      */
     @JsonProperty("comments")
+    @Transient
     private String comments;
     /**
      * certainty of person's possession of a forename
      * 
      */
     @JsonProperty("certain")
+    @Transient
     private Boolean certain;
     /**
      * end of person's possession of a forename
      * 
      */
     @JsonProperty("dateEnd")
+    @Transient
     private Double dateEnd;
     /**
      * start of person's possession of a forename
      * 
      */
     @JsonProperty("dateStart")
+    @Transient
     private Double dateStart;
     /**
      * formal order of person's multiple forenames
@@ -58,27 +73,32 @@ public class HasForeName {
      * 
      */
     @JsonProperty("order")
+    @Transient
     private Integer order;
     /**
      * chronological sequence of person's possession of different forenames
      * 
      */
     @JsonProperty("precedence")
+    @Transient
     private Integer precedence;
     /**
      * preference of person's usage of a forename
      * 
      */
     @JsonProperty("preference")
+    @Transient
     private Integer preference;
     /**
      * person's forename
      * (Required)
      * 
      */
+    @EndNode
     @JsonProperty("foreName")
     private ForeName foreName;
     @JsonIgnore
+    @Transient
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     /**
@@ -293,4 +313,11 @@ public class HasForeName {
         return new EqualsBuilder().append(comments, rhs.comments).append(certain, rhs.certain).append(dateEnd, rhs.dateEnd).append(dateStart, rhs.dateStart).append(order, rhs.order).append(precedence, rhs.precedence).append(preference, rhs.preference).append(foreName, rhs.foreName).append(additionalProperties, rhs.additionalProperties).isEquals();
     }
 
+    public Neo4jPerson getPerson() {
+        return person;
+    }
+
+    public void setPerson(Neo4jPerson person) {
+        this.person = person;
+    }
 }

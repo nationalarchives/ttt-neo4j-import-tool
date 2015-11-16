@@ -125,7 +125,6 @@ public abstract class Person extends Neo4jObject {
      * 
      */
     @JsonProperty("hasForeNames")
-    @Transient
     private List<HasForeName> hasForeNames = new ArrayList<HasForeName>();
     /**
      * person has nationality/ies

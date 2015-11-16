@@ -21,9 +21,12 @@ import uk.gov.nationalarchives.ttt.neo4j.domain.graphperson.MongoPerson;
 import uk.gov.nationalarchives.ttt.neo4j.domain.graphperson.Neo4jPerson;
 import uk.gov.nationalarchives.ttt.neo4j.domain.graphperson.Person;
 import uk.gov.nationalarchives.ttt.neo4j.domain.graphperson.generated.FamilyName;
+import uk.gov.nationalarchives.ttt.neo4j.domain.graphperson.generated.ForeName;
 import uk.gov.nationalarchives.ttt.neo4j.domain.graphperson.generated.HasFamilyName;
+import uk.gov.nationalarchives.ttt.neo4j.domain.graphperson.generated.HasForeName;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -49,19 +52,73 @@ public class TttNeo4jApplicationTests {
     }
 
     private void emptyDatabase() {
+        neo4jTemplate.deleteAll(HasForeName.class);
+        neo4jTemplate.deleteAll(ForeName.class);
         neo4jTemplate.deleteAll(HasFamilyName.class);
         neo4jTemplate.deleteAll(FamilyName.class);
         neo4jTemplate.deleteAll(Neo4jPerson.class);
     }
 
     @Test
-	public void testSaveOnePersonFromMongoIntoNeo4j() {
+	public void testSavePeopleFromMongoIntoNeo4j() {
         emptyDatabase();
         addIntoNeo4jPeopleFromMongoCollection("WO_98_Discovery_A");
         addIntoNeo4jPeopleFromMongoCollection("WO_98_Discovery_B");
+
         Assert.assertEquals(4, neo4jTemplate.count(Neo4jPerson.class));
         Assert.assertEquals(3, neo4jTemplate.count(FamilyName.class));
+        Assert.assertEquals(4, neo4jTemplate.count(ForeName.class));
         assert2peopleHaveAFamilyNameInCommon();
+        assert1personHas2Forenames();
+    }
+
+    @Test
+    public void testSave1PersonWith1ForeName(){
+        emptyDatabase();
+
+
+        Neo4jPerson person = new Neo4jPerson();
+        person.setRef("TEST_1");
+
+//        FamilyName familyName = new FamilyName();
+//        familyName.setName("Dupond");
+//        HasFamilyName hasFamilyName = new HasFamilyName();
+//        hasFamilyName.setFamilyName(familyName);
+//        person.setHasFamilyNames(Arrays.asList(hasFamilyName));
+
+        ForeName foreName = new ForeName();
+        foreName.setName("Jean");
+        HasForeName hasForeName = new HasForeName();
+        hasForeName.setForeName(foreName);
+        person.setHasForeNames(Arrays.asList(hasForeName));
+
+        personGraphRepository.createOrMergePersonGraph(person);
+        Assert.assertEquals(1, neo4jTemplate.count(Neo4jPerson.class));
+        Assert.assertEquals(1, neo4jTemplate.count(ForeName.class));
+
+        final Neo4jPerson retrievedPerson =
+                neo4jTemplate.queryForObject(
+                        Neo4jPerson.class,
+                        "match (person) --> (m:ForeName {name:{name}}) return person",
+                        new HashMap<String, String>() {{
+                            put("name", "Jean");
+                        }});
+
+        Assert.assertNotNull(retrievedPerson);
+        Assert.assertEquals("TEST_1", retrievedPerson.getRef());
+    }
+
+    private void assert1personHas2Forenames() {
+        final Iterable<ForeName> foreNamesFrom1person =
+                neo4jTemplate.queryForObjects(
+                        ForeName.class,
+                        "match (foreName:ForeName) <-- (:Neo4jPerson) --> (foreName2:ForeName) return foreName, foreName2",
+                        new HashMap<String, String>(){{put("name","barton");
+                        }});
+
+        List<ForeName> forenameList = new ArrayList<>();
+        foreNamesFrom1person.forEach(forenameList::add);
+        Assert.assertEquals(2, forenameList.size());
     }
 
     private void assert2peopleHaveAFamilyNameInCommon() {
