@@ -1,0 +1,182 @@
+[{
+	"hasAwards": [
+		{
+			"award": {
+				"name": "victoria Cross"
+			},
+			"certain": true
+		}
+	],
+	"hasEvents": [
+		{
+			"certain": true,
+			"event": {
+              "hasYear":
+              {
+                "type": "EXACT",
+                "year": {
+                  "value": 1892,
+                  "hasMonth": {
+                    "month": {
+                      "value": 6,
+                      "hasDay": {
+                        "day": {
+                          "value": 15
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "type": "birth"
+			}
+		}
+	],
+	"hasFamilyNames": [
+		{
+			"certain": true,
+			"familyName": {
+				"name": "barton"
+			},
+			"order": 1
+		}
+	],
+	"hasForeNames": [
+		{
+			"certain": true,
+			"foreName": {
+				"name": "william"
+			},
+			"order": 1
+		},
+		{
+			"certain": true,
+			"foreName": {
+				"name": "percy"
+			},
+			"order": 2
+		}
+	],
+	"hasReferences": [
+		{
+			"certain": true,
+			"reference": {
+				"Genre": "military",
+				"name": "Z/4620",
+				"type": "service"
+			}
+		}
+	],
+	"hasRoles": [
+		{
+			"certain": true,
+			"organisation": {
+				"name": "armed Forces"
+			}
+		}
+	],
+	"inContainer": {
+		"document": {
+			"name": "JSON_test_A.txt",
+			"ref": "d7682357",
+			"type": "delim_txt"
+		},
+		"source": {
+			"name": "WO 98 - Discovery"
+		}
+	},
+	"ref": "B_tTT000000001",
+	"type": "UNKNOWN",
+	"timestamp": "2015-07-23T18:47:57.799",
+	"_id": {
+		"$oid": "55b128c5e4b04d497763777f"
+	}
+},
+{
+	"hasAwards": [
+		{
+			"award": {
+				"name": "victoria Cross"
+			},
+			"certain": true
+		}
+	],
+	"hasEvents": [
+		{
+			"certain": true,
+			"event": {
+            "hasYear":
+					{
+                      "type": "EXACT",
+                      "year": {
+                        "value": 1891,
+                        "hasMonth": {
+                          "month": {
+                            "value": 5,
+                            "hasDay": {
+						"day": {
+							"value": 13
+						}
+					}
+                          }
+                        }
+						}
+					},
+				"type": "birth"
+			}
+		}
+	],
+	"hasFamilyNames": [
+		{
+			"certain": true,
+			"familyName": {
+				"name": "carter"
+			},
+			"order": 1
+		}
+	],
+	"hasForeNames": [
+		{
+			"certain": true,
+			"foreName": {
+				"name": "john"
+			},
+			"order": 1
+		}
+	],
+	"hasReferences": [
+		{
+			"certain": true,
+			"reference": {
+				"genre": "military",
+				"name": "Z/4796",
+				"type": "service"
+			}
+		}
+	],
+	"hasRoles": [
+		{
+			"certain": true,
+			"organisation": {
+				"name": "armed Forces"
+			}
+		}
+	],
+	"inContainer": {
+		"document": {
+			"name": "JSON_test_A.txt",
+			"ref": "d7682479",
+			"type": "delim_txt"
+		},
+		"source": {
+			"name": "WO 98 - Discovery"
+		}
+	},
+	"ref": "B_tTT000000002",
+	"type": "UNKNOWN",
+	"timestamp": "2015-07-23T18:47:59.002",
+	"_id": {
+		"$oid": "55b128c5e4b04d4977637780"
+	}
+}]
+

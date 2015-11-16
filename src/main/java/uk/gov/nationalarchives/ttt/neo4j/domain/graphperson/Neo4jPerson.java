@@ -11,7 +11,7 @@ public class Neo4jPerson extends Person {
 //        this.setHasForeNames(person.getHasForeNames());
         this.setHasFamilyNames(person.getHasFamilyNames());
         for (HasFamilyName hasFamilyName : person.getHasFamilyNames()) {
-            hasFamilyName.person=this;
+            hasFamilyName.setPerson(this);
         }
 
         this.setRef(person.getRef());

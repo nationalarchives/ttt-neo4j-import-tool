@@ -34,7 +34,7 @@ public class HasFamilyName extends Neo4jObject {
 
     @JsonIgnore
     @StartNode
-    public Neo4jPerson person;
+    private Neo4jPerson person;
 
     /**
      * general notes / comments
@@ -310,4 +310,11 @@ public class HasFamilyName extends Neo4jObject {
         return new EqualsBuilder().append(comments, rhs.comments).append(certain, rhs.certain).append(dateEnd, rhs.dateEnd).append(dateStart, rhs.dateStart).append(order, rhs.order).append(precedence, rhs.precedence).append(preference, rhs.preference).append(familyName, rhs.familyName).append(additionalProperties, rhs.additionalProperties).isEquals();
     }
 
+    public Neo4jPerson getPerson() {
+        return person;
+    }
+
+    public void setPerson(Neo4jPerson person) {
+        this.person = person;
+    }
 }

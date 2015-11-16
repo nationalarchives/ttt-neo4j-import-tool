@@ -6,5 +6,5 @@ import uk.gov.nationalarchives.ttt.neo4j.domain.graphperson.Neo4jPerson;
 /**
  * Created by jcharlet on 14/11/15.
  */
-public interface PersonGraphRepository extends GraphRepository<Neo4jPerson> {
+public interface PersonGraphRepository extends GraphRepository<Neo4jPerson>, CustomPersonGraphRepository {
 }
