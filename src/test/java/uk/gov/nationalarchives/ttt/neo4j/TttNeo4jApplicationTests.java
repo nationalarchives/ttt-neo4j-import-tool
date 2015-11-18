@@ -1,8 +1,6 @@
 package uk.gov.nationalarchives.ttt.neo4j;
 
 import com.mongodb.BasicDBObject;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.IteratorUtils;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.junit.Assert;
 import org.junit.Before;
@@ -17,6 +15,7 @@ import org.springframework.data.neo4j.template.Neo4jTemplate;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import uk.gov.nationalarchives.ttt.neo4j.dao.neo4j.PersonGraphRepository;
+import uk.gov.nationalarchives.ttt.neo4j.dao.neo4j.impl.PersonGraphRepositoryWithCypherQueriesImpl;
 import uk.gov.nationalarchives.ttt.neo4j.domain.graphperson.MongoPerson;
 import uk.gov.nationalarchives.ttt.neo4j.domain.graphperson.Neo4jPerson;
 import uk.gov.nationalarchives.ttt.neo4j.domain.graphperson.Person;
@@ -46,24 +45,50 @@ public class TttNeo4jApplicationTests {
     @Autowired
     PersonGraphRepository personGraphRepository;
 
+    @Autowired
+    PersonGraphRepositoryWithCypherQueriesImpl personGraphRepositoryWithCypherQueries;
+
     @Before
     public void init(){
         neo4jTemplate = new Neo4jTemplate(session);
     }
 
     private void emptyDatabase() {
-        neo4jTemplate.deleteAll(HasForeName.class);
-        neo4jTemplate.deleteAll(ForeName.class);
-        neo4jTemplate.deleteAll(HasFamilyName.class);
-        neo4jTemplate.deleteAll(FamilyName.class);
-        neo4jTemplate.deleteAll(Neo4jPerson.class);
+        neo4jTemplate.query("MATCH (n) DETACH DELETE n", new HashMap<String,Object>());
     }
 
     @Test
-	public void testSavePeopleFromMongoIntoNeo4j() {
+    public void testSavePeopleFromMongoIntoNeo4jWithCypherQueries() {
         emptyDatabase();
-        addIntoNeo4jPeopleFromMongoCollection("WO_98_Discovery_A");
-        addIntoNeo4jPeopleFromMongoCollection("WO_98_Discovery_B");
+
+        List<MongoPerson> people = new ArrayList<>();
+        people.addAll(getPeopleFromMongoCollection("WO_98_Discovery_A"));
+        people.addAll(getPeopleFromMongoCollection("WO_98_Discovery_B"));
+        Assert.assertEquals(4, people.size());
+
+        for (Person person:people){
+            personGraphRepositoryWithCypherQueries.createOrMergePersonGraph(person);
+        }
+
+        Assert.assertEquals(4, session.query("MATCH (n:Person) RETURN count(n)", new HashMap<>()).queryResults().iterator().next().get("count(n)"));
+        Assert.assertEquals(3, session.query("MATCH (n:FamilyName) RETURN count(n)", new HashMap<>()).queryResults().iterator().next().get("count(n)"));
+        Assert.assertEquals(4, session.query("MATCH (n:ForeName) RETURN count(n)", new HashMap<>()).queryResults().iterator().next().get("count(n)"));
+        Assert.assertEquals(2, session.query("MATCH (:Person) --> (n:FamilyName) <-- (Person) RETURN count(n)", new HashMap<>()).queryResults().iterator().next().get("count(n)"));
+        Assert.assertEquals(1, session.query("MATCH (a:ForeName) <-- (n:Person) --> (b:ForeName) RETURN count(DISTINCT n)", new HashMap<>()).queryResults().iterator().next().get("count(DISTINCT n)"));
+    }
+
+    @Test
+    public void testSavePeopleFromMongoIntoNeo4j() {
+        emptyDatabase();
+
+        List<MongoPerson> people = new ArrayList<>();
+        people.addAll(getPeopleFromMongoCollection("WO_98_Discovery_A"));
+        people.addAll(getPeopleFromMongoCollection("WO_98_Discovery_B"));
+        Assert.assertEquals(4, people.size());
+
+        for (Person person:people){
+            personGraphRepository.createOrMergePersonGraph(person);
+        }
 
         Assert.assertEquals(4, neo4jTemplate.count(Neo4jPerson.class));
         Assert.assertEquals(3, neo4jTemplate.count(FamilyName.class));
@@ -134,17 +159,14 @@ public class TttNeo4jApplicationTests {
         Assert.assertEquals(2, neo4jPersonList.size());
     }
 
-    private void addIntoNeo4jPeopleFromMongoCollection(String collectionName) {
-        final List<MongoPerson> people= mongoTemplate.find(
+    private List<MongoPerson> getPeopleFromMongoCollection(String collectionName) {
+        return mongoTemplate.find(
                 new BasicQuery(
                         new BasicDBObject(),
                         new BasicDBObject()),
                 MongoPerson.class,
                 collectionName);
-        Assert.assertEquals(2, people.size());
-        for (Person person:people){
-            personGraphRepository.createOrMergePersonGraph(person);
-        }
+
     }
 
 
