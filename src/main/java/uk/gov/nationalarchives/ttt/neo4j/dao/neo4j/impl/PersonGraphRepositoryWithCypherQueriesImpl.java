@@ -9,7 +9,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.neo4j.template.Neo4jTemplate;
 import org.springframework.stereotype.Repository;
-import uk.gov.nationalarchives.ttt.neo4j.domain.graphperson.Person;
+import uk.gov.nationalarchives.ttt.neo4j.dao.neo4j.PersonGraphRepository;
+import uk.gov.nationalarchives.ttt.neo4j.domain.graphperson.generated.Person;
 import uk.gov.nationalarchives.ttt.neo4j.domain.graphperson.generated.*;
 
 import java.util.HashMap;
@@ -19,7 +20,7 @@ import java.util.Map;
  * Created by jcharlet on 16/11/15.
  */
 @Repository
-public class PersonGraphRepositoryWithCypherQueriesImpl {
+public class PersonGraphRepositoryWithCypherQueriesImpl implements PersonGraphRepository {
 
     private final Session session;
 
@@ -35,44 +36,53 @@ public class PersonGraphRepositoryWithCypherQueriesImpl {
 
     }
 
+    @Override
     public void createOrMergePersonGraph(Person person){
         final Transaction transaction = session.beginTransaction();
+        try {
+            Integer personOutputId = createPerson(person);
 
-        Integer personOutputId = createPerson(person);
 
+            if(!CollectionUtils.isEmpty(person.getHasFamilyNames())){
+                for (HasFamilyName hasFamilyName : person.getHasFamilyNames()) {
+                    final Integer familyNameOutputId = mergeFamilyName(hasFamilyName.getFamilyName());
 
-        if(!CollectionUtils.isEmpty(person.getHasFamilyNames())){
-            for (HasFamilyName hasFamilyName : person.getHasFamilyNames()) {
-                final Integer familyNameOutputId = mergeFamilyName(hasFamilyName.getFamilyName());
-
-                Map<String, Object> relationshipProperties= new HashMap<>();
-                relationshipProperties.put("order", hasFamilyName.getOrder());
-                createRelationship(personOutputId, relationshipProperties, familyNameOutputId, "HAS_FAMILY_NAME");
+                    Map<String, Object> relationshipProperties= new HashMap<>();
+                    if (hasFamilyName.getOrder()!=null){
+                        relationshipProperties.put("order", hasFamilyName.getOrder());
+                    }
+                    createRelationship(personOutputId, relationshipProperties, familyNameOutputId, "HAS_FAMILY_NAME");
+                }
             }
+
+            if(!CollectionUtils.isEmpty(person.getHasForeNames())){
+                for (HasForeName hasForeName : person.getHasForeNames()) {
+                    final Integer foreNameOutputId = mergeForeName(hasForeName.getForeName());
+
+                    Map<String, Object> relationshipProperties= new HashMap<>();
+                    if (hasForeName.getOrder()!=null){
+                        relationshipProperties.put("order", hasForeName.getOrder());
+                    }
+                    createRelationship(personOutputId, relationshipProperties, foreNameOutputId, "HAS_FORE_NAME");
+                }
+            }
+
+            if(!CollectionUtils.isEmpty(person.getHasReferences())){
+                for (HasReference hasReference : person.getHasReferences()) {
+                    final Integer referenceOutputId = mergeReference(hasReference.getReference());
+
+                    createRelationship(personOutputId, new HashMap<String,Object>(), referenceOutputId,
+                            "HAS_REFERENCE");
+                }
+            }
+
+            transaction.commit();
+        } catch (Exception e) {
+            logger.error("an error occured while creating the person graph",e);
+        } finally {
+            transaction.close();
         }
 
-        if(!CollectionUtils.isEmpty(person.getHasForeNames())){
-            for (HasForeName hasForeName : person.getHasForeNames()) {
-                final Integer foreNameOutputId = mergeForeName(hasForeName.getForeName());
-
-                Map<String, Object> relationshipProperties= new HashMap<>();
-                relationshipProperties.put("order", hasForeName.getOrder());
-                createRelationship(personOutputId, relationshipProperties, foreNameOutputId, "HAS_FORE_NAME");
-            }
-        }
-
-        if(!CollectionUtils.isEmpty(person.getHasReferences())){
-            for (HasReference hasReference : person.getHasReferences()) {
-                final Integer referenceOutputId = mergeReference(hasReference.getReference());
-
-                createRelationship(personOutputId, new HashMap<String,Object>(), referenceOutputId,
-                        "HAS_REFERENCE");
-            }
-        }
-
-        transaction.commit();
-
-        transaction.close();
     }
 
     private Integer mergeReference(Reference reference) {

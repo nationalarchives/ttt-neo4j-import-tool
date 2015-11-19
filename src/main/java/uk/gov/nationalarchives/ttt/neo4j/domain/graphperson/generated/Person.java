@@ -1,19 +1,22 @@
 
-package uk.gov.nationalarchives.ttt.neo4j.domain.graphperson;
+package uk.gov.nationalarchives.ttt.neo4j.domain.graphperson.generated;
 
-import com.fasterxml.jackson.annotation.*;
-import org.apache.commons.lang.builder.EqualsBuilder;
-import org.apache.commons.lang.builder.HashCodeBuilder;
-import org.apache.commons.lang.builder.ToStringBuilder;
-import org.neo4j.ogm.annotation.Property;
-import org.neo4j.ogm.annotation.Transient;
-import uk.gov.nationalarchives.ttt.neo4j.domain.graphperson.generated.*;
-
-import javax.annotation.Generated;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.annotation.Generated;
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import com.fasterxml.jackson.annotation.JsonAnySetter;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.fasterxml.jackson.annotation.JsonValue;
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.apache.commons.lang.builder.ToStringBuilder;
 
 
 /**
@@ -54,65 +57,55 @@ import java.util.Map;
     "timestamp",
     "type"
 })
-//@NodeEntity
-//@org.springframework.data.mongodb.core.mapping.Document(collection = "WO_98_Discovery_A")
-public abstract class Person extends Neo4jObject {
+public class Person {
 
     /**
      * general notes / comments
      * 
      */
     @JsonProperty("comments")
-    @Transient
     private String comments;
     /**
      * single 'floruit' date for a person inferred from the data
      * 
      */
     @JsonProperty("aliveYear")
-    @Transient
     private AliveYear aliveYear;
     /**
      * single deceased date for a person inferred from the data
      * 
      */
     @JsonProperty("deadYear")
-    @Transient
     private DeadYear deadYear;
     /**
      * person has an age
      * 
      */
     @JsonProperty("hasAge")
-    @Transient
     private HasAge hasAge;
     /**
      * person has alias(es)
      * 
      */
     @JsonProperty("hasAliases")
-    @Transient
     private List<HasAlias> hasAliases = new ArrayList<HasAlias>();
     /**
      * person has award(s)
      * 
      */
     @JsonProperty("hasAwards")
-    @Transient
     private List<HasAward> hasAwards = new ArrayList<HasAward>();
     /**
      * person has children
      * 
      */
     @JsonProperty("hasChilds")
-    @Transient
     private List<HasChild> hasChilds = new ArrayList<HasChild>();
     /**
      * person experiences event(s)
      * 
      */
     @JsonProperty("hasEvents")
-    @Transient
     private List<HasEvent> hasEvents = new ArrayList<HasEvent>();
     /**
      * person has a family name
@@ -131,35 +124,30 @@ public abstract class Person extends Neo4jObject {
      * 
      */
     @JsonProperty("hasNationalities")
-    @Transient
     private List<HasNationality> hasNationalities = new ArrayList<HasNationality>();
     /**
      * person has occupation(s)
      * 
      */
     @JsonProperty("hasOccupations")
-    @Transient
     private List<HasOccupation> hasOccupations = new ArrayList<HasOccupation>();
     /**
      * person has a place of origin or birth
      * 
      */
     @JsonProperty("hasOrigin")
-    @Transient
     private HasOrigin hasOrigin;
     /**
      * person has parent(s)
      * 
      */
     @JsonProperty("hasParents")
-    @Transient
     private List<HasParent> hasParents = new ArrayList<HasParent>();
     /**
      * has association with a place
      * 
      */
     @JsonProperty("hasPlaces")
-    @Transient
     private List<HasPlace> hasPlaces = new ArrayList<HasPlace>();
     /**
      * person has reference number(s)
@@ -172,35 +160,30 @@ public abstract class Person extends Neo4jObject {
      * 
      */
     @JsonProperty("hasRelations")
-    @Transient
     private List<HasRelation> hasRelations = new ArrayList<HasRelation>();
     /**
      * person has role(s) in or regarding something
      * 
      */
     @JsonProperty("hasRoles")
-    @Transient
     private List<HasRole> hasRoles = new ArrayList<HasRole>();
     /**
      * person has siblings
      * 
      */
     @JsonProperty("hasSiblings")
-    @Transient
     private List<HasSibling> hasSiblings = new ArrayList<HasSibling>();
     /**
      * person has spouse(s)
      * 
      */
     @JsonProperty("hasSpouses")
-    @Transient
     private List<HasSpouse> hasSpouses = new ArrayList<HasSpouse>();
     /**
      * person has title(s)
      * 
      */
     @JsonProperty("hasTitles")
-    @Transient
     private List<HasTitle> hasTitles = new ArrayList<HasTitle>();
     /**
      * document or data source in which person is found
@@ -208,28 +191,24 @@ public abstract class Person extends Neo4jObject {
      * 
      */
     @JsonProperty("inContainer")
-    @Transient
     private InContainer inContainer;
     /**
      * end of 'floruit' date range for a person inferred from the data
      * 
      */
     @JsonProperty("aliveYearEnd")
-    @Transient
     private AliveYearEnd aliveYearEnd;
     /**
      * start of 'floruit' date range for a person inferred from the data
      * 
      */
     @JsonProperty("aliveYearStart")
-    @Transient
     private AliveYearStart aliveYearStart;
     /**
      * another person that might be the 'same as' this person
      * 
      */
     @JsonProperty("links")
-    @Transient
     private List<Link> links = new ArrayList<Link>();
     /**
      * person identifier
@@ -237,8 +216,6 @@ public abstract class Person extends Neo4jObject {
      * 
      */
     @JsonProperty("ref")
-//    @GraphId
-    @Property
     private String ref;
     /**
      * date/time person identified
@@ -255,7 +232,6 @@ public abstract class Person extends Neo4jObject {
     @JsonProperty("type")
     private Person.Type type = Person.Type.fromValue("UNKNOWN");
     @JsonIgnore
-    @Transient
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     /**

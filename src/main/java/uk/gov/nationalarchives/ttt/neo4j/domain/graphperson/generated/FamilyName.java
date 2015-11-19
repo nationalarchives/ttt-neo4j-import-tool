@@ -15,8 +15,6 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
-import org.neo4j.ogm.annotation.*;
-import uk.gov.nationalarchives.ttt.neo4j.domain.graphperson.Neo4jObject;
 
 
 /**
@@ -32,15 +30,13 @@ import uk.gov.nationalarchives.ttt.neo4j.domain.graphperson.Neo4jObject;
     "familyNameAliases",
     "hasParticle"
 })
-@NodeEntity
-public class FamilyName extends Neo4jObject {
+public class FamilyName {
 
     /**
      * general notes / comments
      * 
      */
     @JsonProperty("comments")
-    @Transient
     private String comments;
     /**
      * name of person's family name
@@ -48,32 +44,26 @@ public class FamilyName extends Neo4jObject {
      * 
      */
     @JsonProperty("name")
-    @Property
-    @Index(unique = true)
     private String name;
     /**
      * type of person's family name
      * 
      */
     @JsonProperty("type")
-    @Transient
     private String type;
     /**
      * person's family name has alias(es)
      * 
      */
     @JsonProperty("familyNameAliases")
-    @Transient
     private List<FamilyNameAlias> familyNameAliases = new ArrayList<FamilyNameAlias>();
     /**
      * alias has nobiliary or other descriptive/prepositional particle(s)
      * 
      */
     @JsonProperty("hasParticle")
-    @Transient
     private HasParticle hasParticle;
     @JsonIgnore
-    @Transient
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     /**

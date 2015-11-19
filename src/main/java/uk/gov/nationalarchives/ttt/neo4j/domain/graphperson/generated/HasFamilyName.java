@@ -13,9 +13,6 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
-import org.neo4j.ogm.annotation.*;
-import uk.gov.nationalarchives.ttt.neo4j.domain.graphperson.Neo4jObject;
-import uk.gov.nationalarchives.ttt.neo4j.domain.graphperson.Neo4jPerson;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Generated("org.jsonschema2pojo")
@@ -29,40 +26,31 @@ import uk.gov.nationalarchives.ttt.neo4j.domain.graphperson.Neo4jPerson;
     "preference",
     "familyName"
 })
-@RelationshipEntity(type="HAS_FAMILY_NAME")
-public class HasFamilyName extends Neo4jObject {
-
-    @JsonIgnore
-    @StartNode
-    private Neo4jPerson person;
+public class HasFamilyName {
 
     /**
      * general notes / comments
      * 
      */
     @JsonProperty("comments")
-    @Transient
     private String comments;
     /**
      * certainty of person's possession of a family name
      * 
      */
     @JsonProperty("certain")
-    @Transient
     private Boolean certain;
     /**
      * end of person's possession of a family name
      * 
      */
     @JsonProperty("dateEnd")
-    @Transient
     private Double dateEnd;
     /**
      * start of person's possession of a family name
      * 
      */
     @JsonProperty("dateStart")
-    @Transient
     private Double dateStart;
     /**
      * formal order of person's multiple family names
@@ -70,32 +58,27 @@ public class HasFamilyName extends Neo4jObject {
      * 
      */
     @JsonProperty("order")
-    @Transient
     private Integer order;
     /**
      * chronological sequence of person's possession of different family names
      * 
      */
     @JsonProperty("precedence")
-    @Transient
     private Integer precedence;
     /**
      * preference of person's usage of a family name
      * 
      */
     @JsonProperty("preference")
-    @Transient
     private Integer preference;
     /**
      * person's family name
      * (Required)
      * 
      */
-    @EndNode
     @JsonProperty("familyName")
     private FamilyName familyName;
     @JsonIgnore
-    @Transient
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     /**
@@ -310,11 +293,4 @@ public class HasFamilyName extends Neo4jObject {
         return new EqualsBuilder().append(comments, rhs.comments).append(certain, rhs.certain).append(dateEnd, rhs.dateEnd).append(dateStart, rhs.dateStart).append(order, rhs.order).append(precedence, rhs.precedence).append(preference, rhs.preference).append(familyName, rhs.familyName).append(additionalProperties, rhs.additionalProperties).isEquals();
     }
 
-    public Neo4jPerson getPerson() {
-        return person;
-    }
-
-    public void setPerson(Neo4jPerson person) {
-        this.person = person;
-    }
 }
