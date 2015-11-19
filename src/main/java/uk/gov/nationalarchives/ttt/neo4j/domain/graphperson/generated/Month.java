@@ -1,5 +1,5 @@
 
-package uk.gov.nationalarchives.ttt.neo4j.domain.graphperson.generated;
+package uk.gov.nationalarchives.ttt.linker.model.graphperson.generated;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -25,12 +25,12 @@ import org.apache.commons.lang.builder.ToStringBuilder;
     "comments",
     "name",
     "value",
-    "hasDay"
+    "hasYear"
 })
 public class Month {
 
     /**
-     * general notes / comments
+     * notes or comments
      * 
      */
     @JsonProperty("comments")
@@ -49,16 +49,16 @@ public class Month {
     @JsonProperty("value")
     private Double value;
     /**
-     * has a day date
+     * has a single year date
      * 
      */
-    @JsonProperty("hasDay")
-    private HasDay hasDay;
+    @JsonProperty("hasYear")
+    private HasYear hasYear;
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     /**
-     * general notes / comments
+     * notes or comments
      * 
      * @return
      *     The comments
@@ -69,7 +69,7 @@ public class Month {
     }
 
     /**
-     * general notes / comments
+     * notes or comments
      * 
      * @param comments
      *     The comments
@@ -126,25 +126,25 @@ public class Month {
     }
 
     /**
-     * has a day date
+     * has a single year date
      * 
      * @return
-     *     The hasDay
+     *     The hasYear
      */
-    @JsonProperty("hasDay")
-    public HasDay getHasDay() {
-        return hasDay;
+    @JsonProperty("hasYear")
+    public HasYear getHasYear() {
+        return hasYear;
     }
 
     /**
-     * has a day date
+     * has a single year date
      * 
-     * @param hasDay
-     *     The hasDay
+     * @param hasYear
+     *     The hasYear
      */
-    @JsonProperty("hasDay")
-    public void setHasDay(HasDay hasDay) {
-        this.hasDay = hasDay;
+    @JsonProperty("hasYear")
+    public void setHasYear(HasYear hasYear) {
+        this.hasYear = hasYear;
     }
 
     @Override
@@ -164,7 +164,7 @@ public class Month {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(comments).append(name).append(value).append(hasDay).append(additionalProperties).toHashCode();
+        return new HashCodeBuilder().append(comments).append(name).append(value).append(hasYear).append(additionalProperties).toHashCode();
     }
 
     @Override
@@ -176,7 +176,7 @@ public class Month {
             return false;
         }
         Month rhs = ((Month) other);
-        return new EqualsBuilder().append(comments, rhs.comments).append(name, rhs.name).append(value, rhs.value).append(hasDay, rhs.hasDay).append(additionalProperties, rhs.additionalProperties).isEquals();
+        return new EqualsBuilder().append(comments, rhs.comments).append(name, rhs.name).append(value, rhs.value).append(hasYear, rhs.hasYear).append(additionalProperties, rhs.additionalProperties).isEquals();
     }
 
 }

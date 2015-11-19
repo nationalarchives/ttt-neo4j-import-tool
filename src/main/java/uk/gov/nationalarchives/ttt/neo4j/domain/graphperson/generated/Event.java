@@ -1,20 +1,16 @@
 
-package uk.gov.nationalarchives.ttt.neo4j.domain.graphperson.generated;
+package uk.gov.nationalarchives.ttt.linker.model.graphperson.generated;
 
+import com.fasterxml.jackson.annotation.*;
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.apache.commons.lang.builder.ToStringBuilder;
+
+import javax.annotation.Generated;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.annotation.Generated;
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import org.apache.commons.lang.builder.EqualsBuilder;
-import org.apache.commons.lang.builder.HashCodeBuilder;
-import org.apache.commons.lang.builder.ToStringBuilder;
 
 
 /**
@@ -27,16 +23,19 @@ import org.apache.commons.lang.builder.ToStringBuilder;
     "comments",
     "genre",
     "type",
-    "hasYear",
+    "hasDay",
     "hasEndYear",
-    "hasStartYear",
+    "hasMonth",
     "hasOrganisations",
-    "hasPlaces"
+    "hasPlaces",
+    "hasStartYear",
+    "hasTime",
+    "hasYear"
 })
 public class Event {
 
     /**
-     * general notes / comments
+     * notes or comments
      * 
      */
     @JsonProperty("comments")
@@ -55,11 +54,11 @@ public class Event {
     @JsonProperty("type")
     private String type;
     /**
-     * has a single year date
+     * has a day date
      * 
      */
-    @JsonProperty("hasYear")
-    private HasYear hasYear;
+    @JsonProperty("hasDay")
+    private HasDay hasDay;
     /**
      * has an end year date
      * 
@@ -67,11 +66,11 @@ public class Event {
     @JsonProperty("hasEndYear")
     private HasEndYear hasEndYear;
     /**
-     * has a start year date
+     * has a month date
      * 
      */
-    @JsonProperty("hasStartYear")
-    private HasStartYear hasStartYear;
+    @JsonProperty("hasMonth")
+    private HasMonth hasMonth;
     /**
      * involves organisation(s)
      * 
@@ -84,11 +83,29 @@ public class Event {
      */
     @JsonProperty("hasPlaces")
     private List<HasPlace> hasPlaces = new ArrayList<HasPlace>();
+    /**
+     * has a start year date
+     * 
+     */
+    @JsonProperty("hasStartYear")
+    private HasStartYear hasStartYear;
+    /**
+     * has a time
+     * 
+     */
+    @JsonProperty("hasTime")
+    private HasTime hasTime;
+    /**
+     * has a single year date
+     * 
+     */
+    @JsonProperty("hasYear")
+    private HasYear hasYear;
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     /**
-     * general notes / comments
+     * notes or comments
      * 
      * @return
      *     The comments
@@ -99,7 +116,7 @@ public class Event {
     }
 
     /**
-     * general notes / comments
+     * notes or comments
      * 
      * @param comments
      *     The comments
@@ -156,25 +173,25 @@ public class Event {
     }
 
     /**
-     * has a single year date
+     * has a day date
      * 
      * @return
-     *     The hasYear
+     *     The hasDay
      */
-    @JsonProperty("hasYear")
-    public HasYear getHasYear() {
-        return hasYear;
+    @JsonProperty("hasDay")
+    public HasDay getHasDay() {
+        return hasDay;
     }
 
     /**
-     * has a single year date
+     * has a day date
      * 
-     * @param hasYear
-     *     The hasYear
+     * @param hasDay
+     *     The hasDay
      */
-    @JsonProperty("hasYear")
-    public void setHasYear(HasYear hasYear) {
-        this.hasYear = hasYear;
+    @JsonProperty("hasDay")
+    public void setHasDay(HasDay hasDay) {
+        this.hasDay = hasDay;
     }
 
     /**
@@ -200,25 +217,25 @@ public class Event {
     }
 
     /**
-     * has a start year date
+     * has a month date
      * 
      * @return
-     *     The hasStartYear
+     *     The hasMonth
      */
-    @JsonProperty("hasStartYear")
-    public HasStartYear getHasStartYear() {
-        return hasStartYear;
+    @JsonProperty("hasMonth")
+    public HasMonth getHasMonth() {
+        return hasMonth;
     }
 
     /**
-     * has a start year date
+     * has a month date
      * 
-     * @param hasStartYear
-     *     The hasStartYear
+     * @param hasMonth
+     *     The hasMonth
      */
-    @JsonProperty("hasStartYear")
-    public void setHasStartYear(HasStartYear hasStartYear) {
-        this.hasStartYear = hasStartYear;
+    @JsonProperty("hasMonth")
+    public void setHasMonth(HasMonth hasMonth) {
+        this.hasMonth = hasMonth;
     }
 
     /**
@@ -265,6 +282,72 @@ public class Event {
         this.hasPlaces = hasPlaces;
     }
 
+    /**
+     * has a start year date
+     * 
+     * @return
+     *     The hasStartYear
+     */
+    @JsonProperty("hasStartYear")
+    public HasStartYear getHasStartYear() {
+        return hasStartYear;
+    }
+
+    /**
+     * has a start year date
+     * 
+     * @param hasStartYear
+     *     The hasStartYear
+     */
+    @JsonProperty("hasStartYear")
+    public void setHasStartYear(HasStartYear hasStartYear) {
+        this.hasStartYear = hasStartYear;
+    }
+
+    /**
+     * has a time
+     * 
+     * @return
+     *     The hasTime
+     */
+    @JsonProperty("hasTime")
+    public HasTime getHasTime() {
+        return hasTime;
+    }
+
+    /**
+     * has a time
+     * 
+     * @param hasTime
+     *     The hasTime
+     */
+    @JsonProperty("hasTime")
+    public void setHasTime(HasTime hasTime) {
+        this.hasTime = hasTime;
+    }
+
+    /**
+     * has a single year date
+     * 
+     * @return
+     *     The hasYear
+     */
+    @JsonProperty("hasYear")
+    public HasYear getHasYear() {
+        return hasYear;
+    }
+
+    /**
+     * has a single year date
+     * 
+     * @param hasYear
+     *     The hasYear
+     */
+    @JsonProperty("hasYear")
+    public void setHasYear(HasYear hasYear) {
+        this.hasYear = hasYear;
+    }
+
     @Override
     public String toString() {
         return ToStringBuilder.reflectionToString(this);
@@ -282,7 +365,7 @@ public class Event {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(comments).append(genre).append(type).append(hasYear).append(hasEndYear).append(hasStartYear).append(hasOrganisations).append(hasPlaces).append(additionalProperties).toHashCode();
+        return new HashCodeBuilder().append(comments).append(genre).append(type).append(hasDay).append(hasEndYear).append(hasMonth).append(hasOrganisations).append(hasPlaces).append(hasStartYear).append(hasTime).append(hasYear).append(additionalProperties).toHashCode();
     }
 
     @Override
@@ -294,7 +377,7 @@ public class Event {
             return false;
         }
         Event rhs = ((Event) other);
-        return new EqualsBuilder().append(comments, rhs.comments).append(genre, rhs.genre).append(type, rhs.type).append(hasYear, rhs.hasYear).append(hasEndYear, rhs.hasEndYear).append(hasStartYear, rhs.hasStartYear).append(hasOrganisations, rhs.hasOrganisations).append(hasPlaces, rhs.hasPlaces).append(additionalProperties, rhs.additionalProperties).isEquals();
+        return new EqualsBuilder().append(comments, rhs.comments).append(genre, rhs.genre).append(type, rhs.type).append(hasDay, rhs.hasDay).append(hasEndYear, rhs.hasEndYear).append(hasMonth, rhs.hasMonth).append(hasOrganisations, rhs.hasOrganisations).append(hasPlaces, rhs.hasPlaces).append(hasStartYear, rhs.hasStartYear).append(hasTime, rhs.hasTime).append(hasYear, rhs.hasYear).append(additionalProperties, rhs.additionalProperties).isEquals();
     }
 
 }

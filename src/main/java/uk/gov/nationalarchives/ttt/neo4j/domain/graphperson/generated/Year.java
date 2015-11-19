@@ -1,5 +1,5 @@
 
-package uk.gov.nationalarchives.ttt.neo4j.domain.graphperson.generated;
+package uk.gov.nationalarchives.ttt.linker.model.graphperson.generated;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -24,13 +24,12 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 @JsonPropertyOrder({
     "comments",
     "name",
-    "value",
-    "hasMonth"
+    "value"
 })
 public class Year {
 
     /**
-     * general notes / comments
+     * notes or comments
      * 
      */
     @JsonProperty("comments")
@@ -48,17 +47,11 @@ public class Year {
      */
     @JsonProperty("value")
     private Double value;
-    /**
-     * has a month date
-     * 
-     */
-    @JsonProperty("hasMonth")
-    private HasMonth hasMonth;
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     /**
-     * general notes / comments
+     * notes or comments
      * 
      * @return
      *     The comments
@@ -69,7 +62,7 @@ public class Year {
     }
 
     /**
-     * general notes / comments
+     * notes or comments
      * 
      * @param comments
      *     The comments
@@ -125,28 +118,6 @@ public class Year {
         this.value = value;
     }
 
-    /**
-     * has a month date
-     * 
-     * @return
-     *     The hasMonth
-     */
-    @JsonProperty("hasMonth")
-    public HasMonth getHasMonth() {
-        return hasMonth;
-    }
-
-    /**
-     * has a month date
-     * 
-     * @param hasMonth
-     *     The hasMonth
-     */
-    @JsonProperty("hasMonth")
-    public void setHasMonth(HasMonth hasMonth) {
-        this.hasMonth = hasMonth;
-    }
-
     @Override
     public String toString() {
         return ToStringBuilder.reflectionToString(this);
@@ -164,7 +135,7 @@ public class Year {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(comments).append(name).append(value).append(hasMonth).append(additionalProperties).toHashCode();
+        return new HashCodeBuilder().append(comments).append(name).append(value).append(additionalProperties).toHashCode();
     }
 
     @Override
@@ -176,7 +147,7 @@ public class Year {
             return false;
         }
         Year rhs = ((Year) other);
-        return new EqualsBuilder().append(comments, rhs.comments).append(name, rhs.name).append(value, rhs.value).append(hasMonth, rhs.hasMonth).append(additionalProperties, rhs.additionalProperties).isEquals();
+        return new EqualsBuilder().append(comments, rhs.comments).append(name, rhs.name).append(value, rhs.value).append(additionalProperties, rhs.additionalProperties).isEquals();
     }
 
 }

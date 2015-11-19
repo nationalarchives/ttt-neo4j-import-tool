@@ -1,5 +1,5 @@
 
-package uk.gov.nationalarchives.ttt.neo4j.domain.graphperson.generated;
+package uk.gov.nationalarchives.ttt.linker.model.graphperson.generated;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -23,7 +23,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 public class WithinPlace {
 
     /**
-     * general notes / comments
+     * notes or comments
      * 
      */
     @JsonProperty("comments")
@@ -38,7 +38,7 @@ public class WithinPlace {
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     /**
-     * general notes / comments
+     * notes or comments
      * 
      * @return
      *     The comments
@@ -49,7 +49,7 @@ public class WithinPlace {
     }
 
     /**
-     * general notes / comments
+     * notes or comments
      * 
      * @param comments
      *     The comments

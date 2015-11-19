@@ -1,5 +1,5 @@
 
-package uk.gov.nationalarchives.ttt.neo4j.domain.graphperson.generated;
+package uk.gov.nationalarchives.ttt.linker.model.graphperson.generated;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -24,12 +24,13 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 @JsonPropertyOrder({
     "comments",
     "name",
-    "timestamp"
+    "timestamp",
+    "hasDay"
 })
 public class Time {
 
     /**
-     * general notes / comments
+     * notes or comments
      * 
      */
     @JsonProperty("comments")
@@ -47,11 +48,17 @@ public class Time {
      */
     @JsonProperty("timestamp")
     private String timestamp;
+    /**
+     * has a day date
+     * 
+     */
+    @JsonProperty("hasDay")
+    private HasDay hasDay;
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     /**
-     * general notes / comments
+     * notes or comments
      * 
      * @return
      *     The comments
@@ -62,7 +69,7 @@ public class Time {
     }
 
     /**
-     * general notes / comments
+     * notes or comments
      * 
      * @param comments
      *     The comments
@@ -118,6 +125,28 @@ public class Time {
         this.timestamp = timestamp;
     }
 
+    /**
+     * has a day date
+     * 
+     * @return
+     *     The hasDay
+     */
+    @JsonProperty("hasDay")
+    public HasDay getHasDay() {
+        return hasDay;
+    }
+
+    /**
+     * has a day date
+     * 
+     * @param hasDay
+     *     The hasDay
+     */
+    @JsonProperty("hasDay")
+    public void setHasDay(HasDay hasDay) {
+        this.hasDay = hasDay;
+    }
+
     @Override
     public String toString() {
         return ToStringBuilder.reflectionToString(this);
@@ -135,7 +164,7 @@ public class Time {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(comments).append(name).append(timestamp).append(additionalProperties).toHashCode();
+        return new HashCodeBuilder().append(comments).append(name).append(timestamp).append(hasDay).append(additionalProperties).toHashCode();
     }
 
     @Override
@@ -147,7 +176,7 @@ public class Time {
             return false;
         }
         Time rhs = ((Time) other);
-        return new EqualsBuilder().append(comments, rhs.comments).append(name, rhs.name).append(timestamp, rhs.timestamp).append(additionalProperties, rhs.additionalProperties).isEquals();
+        return new EqualsBuilder().append(comments, rhs.comments).append(name, rhs.name).append(timestamp, rhs.timestamp).append(hasDay, rhs.hasDay).append(additionalProperties, rhs.additionalProperties).isEquals();
     }
 
 }

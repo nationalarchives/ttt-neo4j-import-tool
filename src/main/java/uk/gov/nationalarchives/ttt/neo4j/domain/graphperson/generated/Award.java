@@ -1,16 +1,20 @@
 
-package uk.gov.nationalarchives.ttt.neo4j.domain.graphperson.generated;
+package uk.gov.nationalarchives.ttt.linker.model.graphperson.generated;
 
-import com.fasterxml.jackson.annotation.*;
-import org.apache.commons.lang.builder.EqualsBuilder;
-import org.apache.commons.lang.builder.HashCodeBuilder;
-import org.apache.commons.lang.builder.ToStringBuilder;
-
-import javax.annotation.Generated;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.annotation.Generated;
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import com.fasterxml.jackson.annotation.JsonAnySetter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.apache.commons.lang.builder.ToStringBuilder;
 
 
 /**
@@ -27,7 +31,7 @@ import java.util.Map;
 public class Award {
 
     /**
-     * general notes / comments
+     * notes or comments
      * 
      */
     @JsonProperty("comments")
@@ -44,12 +48,12 @@ public class Award {
      * 
      */
     @JsonProperty("awardAliases")
-    private List<uk.gov.nationalarchives.ttt.neo4j.domain.graphperson.generated.AwardAlias> awardAliases = new ArrayList<uk.gov.nationalarchives.ttt.neo4j.domain.graphperson.generated.AwardAlias>();
+    private List<AwardAlias> awardAliases = new ArrayList<AwardAlias>();
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     /**
-     * general notes / comments
+     * notes or comments
      * 
      * @return
      *     The comments
@@ -60,7 +64,7 @@ public class Award {
     }
 
     /**
-     * general notes / comments
+     * notes or comments
      * 
      * @param comments
      *     The comments
@@ -101,7 +105,7 @@ public class Award {
      *     The awardAliases
      */
     @JsonProperty("awardAliases")
-    public List<uk.gov.nationalarchives.ttt.neo4j.domain.graphperson.generated.AwardAlias> getAwardAliases() {
+    public List<AwardAlias> getAwardAliases() {
         return awardAliases;
     }
 
@@ -112,7 +116,7 @@ public class Award {
      *     The awardAliases
      */
     @JsonProperty("awardAliases")
-    public void setAwardAliases(List<uk.gov.nationalarchives.ttt.neo4j.domain.graphperson.generated.AwardAlias> awardAliases) {
+    public void setAwardAliases(List<AwardAlias> awardAliases) {
         this.awardAliases = awardAliases;
     }
 

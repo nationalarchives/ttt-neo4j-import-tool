@@ -1,4 +1,4 @@
-package uk.gov.nationalarchives.ttt.neo4j.domain.graphperson.constants;
+package uk.gov.nationalarchives.ttt.linker.model.graphperson.constants;
 
 /**
  * Created by jcharlet on 10/22/15.

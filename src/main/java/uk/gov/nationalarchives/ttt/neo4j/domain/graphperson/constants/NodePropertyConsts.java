@@ -6,7 +6,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this 
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. 
  */
-package uk.gov.nationalarchives.ttt.neo4j.domain.graphperson.constants;
+package uk.gov.nationalarchives.ttt.linker.model.graphperson.constants;
 
 /**
  * @author knagaraj

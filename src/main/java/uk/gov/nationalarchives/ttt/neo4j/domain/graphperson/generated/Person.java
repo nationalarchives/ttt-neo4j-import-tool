@@ -1,5 +1,5 @@
 
-package uk.gov.nationalarchives.ttt.neo4j.domain.graphperson.generated;
+package uk.gov.nationalarchives.ttt.linker.model.graphperson.generated;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -30,6 +30,8 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 @JsonPropertyOrder({
     "comments",
     "aliveYear",
+    "aliveYearEnd",
+    "aliveYearStart",
     "deadYear",
     "hasAge",
     "hasAliases",
@@ -50,8 +52,6 @@ import org.apache.commons.lang.builder.ToStringBuilder;
     "hasSpouses",
     "hasTitles",
     "inContainer",
-    "aliveYearEnd",
-    "aliveYearStart",
     "links",
     "ref",
     "timestamp",
@@ -60,7 +60,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 public class Person {
 
     /**
-     * general notes / comments
+     * notes or comments
      * 
      */
     @JsonProperty("comments")
@@ -71,6 +71,18 @@ public class Person {
      */
     @JsonProperty("aliveYear")
     private AliveYear aliveYear;
+    /**
+     * end of 'floruit' date range for a person inferred from the data
+     * 
+     */
+    @JsonProperty("aliveYearEnd")
+    private AliveYearEnd aliveYearEnd;
+    /**
+     * start of 'floruit' date range for a person inferred from the data
+     * 
+     */
+    @JsonProperty("aliveYearStart")
+    private AliveYearStart aliveYearStart;
     /**
      * single deceased date for a person inferred from the data
      * 
@@ -193,18 +205,6 @@ public class Person {
     @JsonProperty("inContainer")
     private InContainer inContainer;
     /**
-     * end of 'floruit' date range for a person inferred from the data
-     * 
-     */
-    @JsonProperty("aliveYearEnd")
-    private AliveYearEnd aliveYearEnd;
-    /**
-     * start of 'floruit' date range for a person inferred from the data
-     * 
-     */
-    @JsonProperty("aliveYearStart")
-    private AliveYearStart aliveYearStart;
-    /**
      * another person that might be the 'same as' this person
      * 
      */
@@ -235,7 +235,7 @@ public class Person {
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     /**
-     * general notes / comments
+     * notes or comments
      * 
      * @return
      *     The comments
@@ -246,7 +246,7 @@ public class Person {
     }
 
     /**
-     * general notes / comments
+     * notes or comments
      * 
      * @param comments
      *     The comments
@@ -276,6 +276,50 @@ public class Person {
     @JsonProperty("aliveYear")
     public void setAliveYear(AliveYear aliveYear) {
         this.aliveYear = aliveYear;
+    }
+
+    /**
+     * end of 'floruit' date range for a person inferred from the data
+     * 
+     * @return
+     *     The aliveYearEnd
+     */
+    @JsonProperty("aliveYearEnd")
+    public AliveYearEnd getAliveYearEnd() {
+        return aliveYearEnd;
+    }
+
+    /**
+     * end of 'floruit' date range for a person inferred from the data
+     * 
+     * @param aliveYearEnd
+     *     The aliveYearEnd
+     */
+    @JsonProperty("aliveYearEnd")
+    public void setAliveYearEnd(AliveYearEnd aliveYearEnd) {
+        this.aliveYearEnd = aliveYearEnd;
+    }
+
+    /**
+     * start of 'floruit' date range for a person inferred from the data
+     * 
+     * @return
+     *     The aliveYearStart
+     */
+    @JsonProperty("aliveYearStart")
+    public AliveYearStart getAliveYearStart() {
+        return aliveYearStart;
+    }
+
+    /**
+     * start of 'floruit' date range for a person inferred from the data
+     * 
+     * @param aliveYearStart
+     *     The aliveYearStart
+     */
+    @JsonProperty("aliveYearStart")
+    public void setAliveYearStart(AliveYearStart aliveYearStart) {
+        this.aliveYearStart = aliveYearStart;
     }
 
     /**
@@ -721,50 +765,6 @@ public class Person {
     }
 
     /**
-     * end of 'floruit' date range for a person inferred from the data
-     * 
-     * @return
-     *     The aliveYearEnd
-     */
-    @JsonProperty("aliveYearEnd")
-    public AliveYearEnd getAliveYearEnd() {
-        return aliveYearEnd;
-    }
-
-    /**
-     * end of 'floruit' date range for a person inferred from the data
-     * 
-     * @param aliveYearEnd
-     *     The aliveYearEnd
-     */
-    @JsonProperty("aliveYearEnd")
-    public void setAliveYearEnd(AliveYearEnd aliveYearEnd) {
-        this.aliveYearEnd = aliveYearEnd;
-    }
-
-    /**
-     * start of 'floruit' date range for a person inferred from the data
-     * 
-     * @return
-     *     The aliveYearStart
-     */
-    @JsonProperty("aliveYearStart")
-    public AliveYearStart getAliveYearStart() {
-        return aliveYearStart;
-    }
-
-    /**
-     * start of 'floruit' date range for a person inferred from the data
-     * 
-     * @param aliveYearStart
-     *     The aliveYearStart
-     */
-    @JsonProperty("aliveYearStart")
-    public void setAliveYearStart(AliveYearStart aliveYearStart) {
-        this.aliveYearStart = aliveYearStart;
-    }
-
-    /**
      * another person that might be the 'same as' this person
      * 
      * @return
@@ -875,7 +875,7 @@ public class Person {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(comments).append(aliveYear).append(deadYear).append(hasAge).append(hasAliases).append(hasAwards).append(hasChilds).append(hasEvents).append(hasFamilyNames).append(hasForeNames).append(hasNationalities).append(hasOccupations).append(hasOrigin).append(hasParents).append(hasPlaces).append(hasReferences).append(hasRelations).append(hasRoles).append(hasSiblings).append(hasSpouses).append(hasTitles).append(inContainer).append(aliveYearEnd).append(aliveYearStart).append(links).append(ref).append(timestamp).append(type).append(additionalProperties).toHashCode();
+        return new HashCodeBuilder().append(comments).append(aliveYear).append(aliveYearEnd).append(aliveYearStart).append(deadYear).append(hasAge).append(hasAliases).append(hasAwards).append(hasChilds).append(hasEvents).append(hasFamilyNames).append(hasForeNames).append(hasNationalities).append(hasOccupations).append(hasOrigin).append(hasParents).append(hasPlaces).append(hasReferences).append(hasRelations).append(hasRoles).append(hasSiblings).append(hasSpouses).append(hasTitles).append(inContainer).append(links).append(ref).append(timestamp).append(type).append(additionalProperties).toHashCode();
     }
 
     @Override
@@ -887,7 +887,7 @@ public class Person {
             return false;
         }
         Person rhs = ((Person) other);
-        return new EqualsBuilder().append(comments, rhs.comments).append(aliveYear, rhs.aliveYear).append(deadYear, rhs.deadYear).append(hasAge, rhs.hasAge).append(hasAliases, rhs.hasAliases).append(hasAwards, rhs.hasAwards).append(hasChilds, rhs.hasChilds).append(hasEvents, rhs.hasEvents).append(hasFamilyNames, rhs.hasFamilyNames).append(hasForeNames, rhs.hasForeNames).append(hasNationalities, rhs.hasNationalities).append(hasOccupations, rhs.hasOccupations).append(hasOrigin, rhs.hasOrigin).append(hasParents, rhs.hasParents).append(hasPlaces, rhs.hasPlaces).append(hasReferences, rhs.hasReferences).append(hasRelations, rhs.hasRelations).append(hasRoles, rhs.hasRoles).append(hasSiblings, rhs.hasSiblings).append(hasSpouses, rhs.hasSpouses).append(hasTitles, rhs.hasTitles).append(inContainer, rhs.inContainer).append(aliveYearEnd, rhs.aliveYearEnd).append(aliveYearStart, rhs.aliveYearStart).append(links, rhs.links).append(ref, rhs.ref).append(timestamp, rhs.timestamp).append(type, rhs.type).append(additionalProperties, rhs.additionalProperties).isEquals();
+        return new EqualsBuilder().append(comments, rhs.comments).append(aliveYear, rhs.aliveYear).append(aliveYearEnd, rhs.aliveYearEnd).append(aliveYearStart, rhs.aliveYearStart).append(deadYear, rhs.deadYear).append(hasAge, rhs.hasAge).append(hasAliases, rhs.hasAliases).append(hasAwards, rhs.hasAwards).append(hasChilds, rhs.hasChilds).append(hasEvents, rhs.hasEvents).append(hasFamilyNames, rhs.hasFamilyNames).append(hasForeNames, rhs.hasForeNames).append(hasNationalities, rhs.hasNationalities).append(hasOccupations, rhs.hasOccupations).append(hasOrigin, rhs.hasOrigin).append(hasParents, rhs.hasParents).append(hasPlaces, rhs.hasPlaces).append(hasReferences, rhs.hasReferences).append(hasRelations, rhs.hasRelations).append(hasRoles, rhs.hasRoles).append(hasSiblings, rhs.hasSiblings).append(hasSpouses, rhs.hasSpouses).append(hasTitles, rhs.hasTitles).append(inContainer, rhs.inContainer).append(links, rhs.links).append(ref, rhs.ref).append(timestamp, rhs.timestamp).append(type, rhs.type).append(additionalProperties, rhs.additionalProperties).isEquals();
     }
 
     @Generated("org.jsonschema2pojo")
