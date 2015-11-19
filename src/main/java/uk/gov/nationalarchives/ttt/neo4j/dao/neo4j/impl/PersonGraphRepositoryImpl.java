@@ -7,10 +7,8 @@ import org.neo4j.ogm.session.transaction.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.neo4j.template.Neo4jTemplate;
 import org.springframework.stereotype.Repository;
 import uk.gov.nationalarchives.ttt.neo4j.dao.neo4j.PersonGraphRepository;
-import uk.gov.nationalarchives.ttt.neo4j.domain.graphperson.generated.Person;
 import uk.gov.nationalarchives.ttt.neo4j.domain.graphperson.generated.*;
 
 import java.util.HashMap;
@@ -20,20 +18,15 @@ import java.util.Map;
  * Created by jcharlet on 16/11/15.
  */
 @Repository
-public class PersonGraphRepositoryWithCypherQueriesImpl implements PersonGraphRepository {
+public class PersonGraphRepositoryImpl implements PersonGraphRepository {
 
     private final Session session;
-
-    private final Neo4jTemplate neo4jTemplate;
 
     final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
-    public PersonGraphRepositoryWithCypherQueriesImpl(Session session) {
+    public PersonGraphRepositoryImpl(Session session) {
         this.session = session;
-        neo4jTemplate = new Neo4jTemplate(session);
-
-
     }
 
     @Override
@@ -47,11 +40,7 @@ public class PersonGraphRepositoryWithCypherQueriesImpl implements PersonGraphRe
                 for (HasFamilyName hasFamilyName : person.getHasFamilyNames()) {
                     final Integer familyNameOutputId = mergeFamilyName(hasFamilyName.getFamilyName());
 
-                    Map<String, Object> relationshipProperties= new HashMap<>();
-                    if (hasFamilyName.getOrder()!=null){
-                        relationshipProperties.put("order", hasFamilyName.getOrder());
-                    }
-                    createRelationship(personOutputId, relationshipProperties, familyNameOutputId, "HAS_FAMILY_NAME");
+                    createRelationshipBetweenPersonAndFamilyName(personOutputId, hasFamilyName, familyNameOutputId);
                 }
             }
 
@@ -59,11 +48,7 @@ public class PersonGraphRepositoryWithCypherQueriesImpl implements PersonGraphRe
                 for (HasForeName hasForeName : person.getHasForeNames()) {
                     final Integer foreNameOutputId = mergeForeName(hasForeName.getForeName());
 
-                    Map<String, Object> relationshipProperties= new HashMap<>();
-                    if (hasForeName.getOrder()!=null){
-                        relationshipProperties.put("order", hasForeName.getOrder());
-                    }
-                    createRelationship(personOutputId, relationshipProperties, foreNameOutputId, "HAS_FORE_NAME");
+                    createRelationshipBetweenPersonAndForeName(personOutputId, hasForeName, foreNameOutputId);
                 }
             }
 
@@ -71,8 +56,24 @@ public class PersonGraphRepositoryWithCypherQueriesImpl implements PersonGraphRe
                 for (HasReference hasReference : person.getHasReferences()) {
                     final Integer referenceOutputId = mergeReference(hasReference.getReference());
 
-                    createRelationship(personOutputId, new HashMap<String,Object>(), referenceOutputId,
+                    createRelationship(personOutputId, new HashMap<String, Object>(), referenceOutputId,
                             "HAS_REFERENCE");
+                }
+            }
+
+            if(person.getInContainer()!=null){
+                InContainer inContainer = person.getInContainer();
+                if (inContainer.getDocument()!=null){
+                    final Integer documentId = mergeDocument(inContainer.getDocument());
+
+                    createRelationship(personOutputId, new HashMap<String, Object>(), documentId,
+                            "IN_CONTAINER");
+                }
+                if (inContainer.getSource()!=null){
+                    final Integer sourceId = mergeSource(inContainer.getSource());
+
+                    createRelationship(personOutputId, new HashMap<String, Object>(), sourceId,
+                            "IN_CONTAINER");
                 }
             }
 
@@ -85,37 +86,79 @@ public class PersonGraphRepositoryWithCypherQueriesImpl implements PersonGraphRe
 
     }
 
-    private Integer mergeReference(Reference reference) {
-        Map<String, Object> nodeProperties = new HashMap<>();
-        nodeProperties.put("name", reference.getName());
-        if(reference.getType()!=null){
-            nodeProperties.put("type", reference.getType());
+    private void createRelationshipBetweenPersonAndForeName(Integer personOutputId, HasForeName hasForeName, Integer foreNameOutputId) {
+        Map<String, Object> relationshipProperties= new HashMap<>();
+        if (hasForeName.getOrder()!=null){
+            relationshipProperties.put("order", hasForeName.getOrder());
         }
-        if(reference.getGenre()!=null){
-            nodeProperties.put("genre", reference.getGenre());
-        }
-
-        return mergeNode(reference.getClass().getSimpleName(), nodeProperties);
+        createRelationship(personOutputId, relationshipProperties, foreNameOutputId, "HAS_FORE_NAME");
     }
 
-    private Integer mergeForeName( ForeName foreName) {
-        Map<String, Object> nodeProperties = new HashMap<>();
-        nodeProperties.put("name", foreName.getName());
-        if(foreName.getType()!=null){
-            nodeProperties.put("type", foreName.getType());
+    private void createRelationshipBetweenPersonAndFamilyName(Integer personOutputId, HasFamilyName hasFamilyName, Integer familyNameOutputId) {
+        Map<String, Object> relationshipProperties= new HashMap<>();
+        if (hasFamilyName.getOrder()!=null){
+            relationshipProperties.put("order", hasFamilyName.getOrder());
         }
-
-        return mergeNode(foreName.getClass().getSimpleName(), nodeProperties);
+        createRelationship(personOutputId, relationshipProperties, familyNameOutputId, "HAS_FAMILY_NAME");
     }
 
-    private Integer mergeFamilyName(FamilyName familyName) {
+    private Integer mergeSource(Source node) {
+        Map<String, Object> nodeProperties = new HashMap<>();
+        nodeProperties.put("name", node.getName());
+        if(node.getType()!=null){
+            nodeProperties.put("type", node.getType());
+        }
+        if(node.getRef()!=null){
+            nodeProperties.put("genre", node.getRef());
+        }
+
+        return mergeNode(node.getClass().getSimpleName(), nodeProperties);
+    }
+
+    private Integer mergeDocument(Document node) {
+        Map<String, Object> nodeProperties = new HashMap<>();
+        nodeProperties.put("name", node.getName());
+        if(node.getType()!=null){
+            nodeProperties.put("type", node.getType());
+        }
+        if(node.getRef()!=null){
+            nodeProperties.put("genre", node.getRef());
+        }
+
+        return mergeNode(node.getClass().getSimpleName(), nodeProperties);
+    }
+
+    private Integer mergeReference(Reference node) {
+        Map<String, Object> nodeProperties = new HashMap<>();
+        nodeProperties.put("name", node.getName());
+        if(node.getType()!=null){
+            nodeProperties.put("type", node.getType());
+        }
+        if(node.getGenre()!=null){
+            nodeProperties.put("genre", node.getGenre());
+        }
+
+        return mergeNode(node.getClass().getSimpleName(), nodeProperties);
+    }
+
+    private Integer mergeForeName(ForeName node) {
+        Map<String, Object> nodeProperties = new HashMap<>();
+        nodeProperties.put("name", node.getName());
+        if(node.getType()!=null){
+            nodeProperties.put("type", node.getType());
+        }
+
+        return mergeNode(node.getClass().getSimpleName(), nodeProperties);
+    }
+
+    private Integer mergeFamilyName(FamilyName node) {
         HashMap<String, Object> nodeProperties = new HashMap<>();
 
-        nodeProperties.put("name", familyName.getName());
-        if(familyName.getType()!=null){
-            nodeProperties.put("type", familyName.getType());
+        nodeProperties.put("name", node.getName());
+        if(node.getType()!=null){
+            nodeProperties.put("type", node.getType());
         }
-        return mergeNode(familyName.getClass().getSimpleName(), nodeProperties);
+        return mergeNode(node.getClass().getSimpleName(), nodeProperties);
     }
 
     private Integer createPerson(Person person) {
