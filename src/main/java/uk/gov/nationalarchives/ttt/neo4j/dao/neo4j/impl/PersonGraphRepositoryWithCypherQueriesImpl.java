@@ -9,12 +9,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.neo4j.template.Neo4jTemplate;
 import org.springframework.stereotype.Repository;
-import uk.gov.nationalarchives.ttt.neo4j.domain.graphperson.Neo4jObject;
 import uk.gov.nationalarchives.ttt.neo4j.domain.graphperson.Person;
-import uk.gov.nationalarchives.ttt.neo4j.domain.graphperson.generated.FamilyName;
-import uk.gov.nationalarchives.ttt.neo4j.domain.graphperson.generated.ForeName;
-import uk.gov.nationalarchives.ttt.neo4j.domain.graphperson.generated.HasFamilyName;
-import uk.gov.nationalarchives.ttt.neo4j.domain.graphperson.generated.HasForeName;
+import uk.gov.nationalarchives.ttt.neo4j.domain.graphperson.generated.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -47,19 +43,30 @@ public class PersonGraphRepositoryWithCypherQueriesImpl {
 
         if(!CollectionUtils.isEmpty(person.getHasFamilyNames())){
             for (HasFamilyName hasFamilyName : person.getHasFamilyNames()) {
-                final FamilyName inputFamilyName = hasFamilyName.getFamilyName();
-                final Integer familyNameOutputId = mergeFamilyName(inputFamilyName);
+                final Integer familyNameOutputId = mergeFamilyName(hasFamilyName.getFamilyName());
 
-                mergeRelationshipFromPersonToFamilyName(personOutputId, hasFamilyName, familyNameOutputId);
+                Map<String, Object> relationshipProperties= new HashMap<>();
+                relationshipProperties.put("order", hasFamilyName.getOrder());
+                createRelationship(personOutputId, relationshipProperties, familyNameOutputId, "HAS_FAMILY_NAME");
             }
         }
 
         if(!CollectionUtils.isEmpty(person.getHasForeNames())){
             for (HasForeName hasForeName : person.getHasForeNames()) {
-                final ForeName inputForeName = hasForeName.getForeName();
-                final Integer foreNameOutputId = mergeForeName(inputForeName);
+                final Integer foreNameOutputId = mergeForeName(hasForeName.getForeName());
 
-                mergeRelationshipFromPersonToForeName(personOutputId, hasForeName, foreNameOutputId);
+                Map<String, Object> relationshipProperties= new HashMap<>();
+                relationshipProperties.put("order", hasForeName.getOrder());
+                createRelationship(personOutputId, relationshipProperties, foreNameOutputId, "HAS_FORE_NAME");
+            }
+        }
+
+        if(!CollectionUtils.isEmpty(person.getHasReferences())){
+            for (HasReference hasReference : person.getHasReferences()) {
+                final Integer referenceOutputId = mergeReference(hasReference.getReference());
+
+                createRelationship(personOutputId, new HashMap<String,Object>(), referenceOutputId,
+                        "HAS_REFERENCE");
             }
         }
 
@@ -68,90 +75,88 @@ public class PersonGraphRepositoryWithCypherQueriesImpl {
         transaction.close();
     }
 
-    private void mergeRelationshipFromPersonToFamilyName(Integer personOutputId, HasFamilyName hasFamilyName, Integer familyNameOutputId) {
-        Map<String, Object> parameters = new HashMap<>();
-        parameters.put("personOutputId",personOutputId);
-        parameters.put("familyNameOutputId", familyNameOutputId);
-        parameters.put("order", hasFamilyName.getOrder());
+    private Integer mergeReference(Reference reference) {
+        Map<String, Object> nodeProperties = new HashMap<>();
+        nodeProperties.put("name", reference.getName());
+        if(reference.getType()!=null){
+            nodeProperties.put("type", reference.getType());
+        }
+        if(reference.getGenre()!=null){
+            nodeProperties.put("genre", reference.getGenre());
+        }
 
-        session.query(
-                "MATCH (person:Person), " +
-                        "(familyName:FamilyName)" +
-                        "WHERE id(person)={personOutputId} AND id(familyName)={familyNameOutputId}" +
-                        "MERGE (person) -[:HAS_FAMILY_NAME {order:{order}}]-> (familyName)",
-                parameters);
+        return mergeNode(reference.getClass().getSimpleName(), nodeProperties);
     }
 
-    private void mergeRelationshipFromPersonToForeName(Integer personOutputId, HasForeName hasForeName, Integer foreNameOutputId) {
-        Map<String, Object> parameters = new HashMap<>();
-        parameters.put("personOutputId",personOutputId);
-        parameters.put("foreNameOutputId", foreNameOutputId);
-        parameters.put("order", hasForeName.getOrder());
+    private Integer mergeForeName( ForeName foreName) {
+        Map<String, Object> nodeProperties = new HashMap<>();
+        nodeProperties.put("name", foreName.getName());
+        if(foreName.getType()!=null){
+            nodeProperties.put("type", foreName.getType());
+        }
 
-        session.query(
-                "MATCH (person:Person), " +
-                        "(foreName:ForeName)" +
-                        "WHERE id(person)={personOutputId} AND id(foreName)={foreNameOutputId}" +
-                        "MERGE (person) -[:HAS_FORE_NAME {order:{order}}]-> (foreName)",
-                parameters);
+        return mergeNode(foreName.getClass().getSimpleName(), nodeProperties);
+    }
+
+    private Integer mergeFamilyName(FamilyName familyName) {
+        HashMap<String, Object> nodeProperties = new HashMap<>();
+
+        nodeProperties.put("name", familyName.getName());
+        if(familyName.getType()!=null){
+            nodeProperties.put("type", familyName.getType());
+        }
+        return mergeNode(familyName.getClass().getSimpleName(), nodeProperties);
     }
 
     private Integer createPerson(Person person) {
-        Map<String, Object> personMap = getPersonMap(person);
+        Map<String, Object> personProperties = getPersonProperties(person);
+        return createNode("Person", personProperties);
+    }
 
-        final Result creationResult = session.query(
-                "CREATE (n:Person {props}) RETURN ID(n)",
-                getCypherQueryParameters(personMap));
+    private void createRelationship(Integer startNodeId, Map<String, Object> relationshipProperties, Integer endNodeId, String relationshipLabel) {
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("startNodeId",startNodeId);
+        parameters.put("endNodeId", endNodeId);
+
+        parameters.put("relationshipProperties", relationshipProperties);
+
+        session.query(
+                "MATCH (startNode), " +
+                        "(endNode)" +
+                        "WHERE id(startNode)={startNodeId} AND id(endNode)={endNodeId}" +
+                        "CREATE (startNode) -[:" + relationshipLabel + " {relationshipProperties}]-> (endNode)",
+                parameters);
+    }
+
+    private Integer getSingleNodeIdFromQueryResults(Result creationResult) {
         return (Integer) creationResult.queryResults().iterator().next().get("ID(n)");
     }
 
-    private Integer mergeFamilyName(FamilyName inputFamilyName) {
-        String cypherQuery = "MERGE (n:FamilyName {";
-        Map<String, Object> parameters = new HashMap<>();
+    private Integer mergeNode(final String nodeType, Map<String, Object> nodeProperties) {
+        String saveType = "MERGE";
+        return saveNode(nodeType, nodeProperties, saveType);
+    }
 
-        cypherQuery+="name:{name}";
-        parameters.put("name", inputFamilyName.getName());
+    private Integer createNode(final String nodeType, Map<String, Object> nodeProperties) {
+        String saveType = "CREATE";
+        return saveNode(nodeType, nodeProperties, saveType);
+    }
 
-        if(inputFamilyName.getType()!=null){
-            cypherQuery+=",type:{type}";
-            parameters.put("type", inputFamilyName.getType());
+    private Integer saveNode(String nodeType, Map<String, Object> nodeProperties, String saveType) {
+        String cypherQuery = saveType + " (n:" + nodeType + " {";
+        for (String parameterKey : nodeProperties.keySet()) {
+            cypherQuery+=parameterKey+":{"+parameterKey+"},";
         }
-
+        cypherQuery=cypherQuery.substring(0, cypherQuery.length()-1);
         cypherQuery+="}) RETURN ID(n)";
 
         final Result mergeResult = session.query(
                 cypherQuery,
-                parameters);
-        return (Integer) mergeResult.queryResults().iterator().next().get("ID(n)");
+                nodeProperties);
+        return getSingleNodeIdFromQueryResults(mergeResult);
     }
 
-    private Integer mergeForeName(ForeName inputForeName) {
-        String cypherQuery = "MERGE (n:ForeName {";
-        Map<String, Object> parameters = new HashMap<>();
-
-        cypherQuery+="name:{name}";
-        parameters.put("name", inputForeName.getName());
-
-        if(inputForeName.getType()!=null){
-            cypherQuery+=",type:{type}";
-            parameters.put("type", inputForeName.getType());
-        }
-
-        cypherQuery+="}) RETURN ID(n)";
-
-        final Result mergeResult = session.query(
-                cypherQuery,
-                parameters);
-        return (Integer) mergeResult.queryResults().iterator().next().get("ID(n)");
-    }
-
-    private Map<String, Object> getCypherQueryParameters(Map<String, Object> personMap) {
-        Map<String, Object> parameters = new HashMap<>();
-        parameters.put("props",personMap);
-        return parameters;
-    }
-
-    private Map<String, Object> getPersonMap(Person person) {
+    private Map<String, Object> getPersonProperties(Person person) {
         Map<String, Object> personMap = new HashMap<>();
         personMap.put("ref", person.getRef());
 
