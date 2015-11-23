@@ -1,6 +1,5 @@
 package uk.gov.nationalarchives.ttt.neo4j;
 
-import com.mongodb.BasicDBObject;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.junit.Assert;
 import org.junit.Test;
@@ -8,12 +7,11 @@ import org.junit.runner.RunWith;
 import org.neo4j.ogm.session.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.BasicQuery;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
+import uk.gov.nationalarchives.ttt.neo4j.config.MongoConfiguration;
+import uk.gov.nationalarchives.ttt.neo4j.dao.mongo.PersonDocumentRepository;
 import uk.gov.nationalarchives.ttt.neo4j.dao.neo4j.PersonGraphRepository;
-import uk.gov.nationalarchives.ttt.neo4j.domain.graphperson.constants.EventType;
 import uk.gov.nationalarchives.ttt.neo4j.domain.graphperson.generated.*;
 
 import java.util.ArrayList;
@@ -27,13 +25,13 @@ import java.util.List;
 public class TttNeo4jApplicationTests {
 
     @Autowired
-    MongoTemplate mongoTemplate;
-
-    @Autowired
     Session session;
 
     @Autowired
     PersonGraphRepository personGraphRepository;
+
+    @Autowired
+    PersonDocumentRepository personDocumentRepository;
 
     private void emptyDatabase() {
         session.query("MATCH (n) DETACH DELETE n", new HashMap<String,Object>());
@@ -44,8 +42,10 @@ public class TttNeo4jApplicationTests {
         emptyDatabase();
 
         List<Person> people = new ArrayList<>();
-        people.addAll(getPeopleFromMongoCollection("WO_98_Discovery_A"));
-        people.addAll(getPeopleFromMongoCollection("WO_98_Discovery_B"));
+        MongoConfiguration.setPersonCollectionName("WO_98_Discovery_A");
+        people.addAll(personDocumentRepository.findAll());
+        MongoConfiguration.setPersonCollectionName("WO_98_Discovery_B");
+        people.addAll(personDocumentRepository.findAll());
         Assert.assertEquals(4, people.size());
 
         for (Person person:people){
@@ -58,7 +58,6 @@ public class TttNeo4jApplicationTests {
         Assert.assertEquals(2, session.query("MATCH (:Person) --> (n:FamilyName) <-- (Person) RETURN count(n)", new HashMap<>()).queryResults().iterator().next().get("count(n)"));
         Assert.assertEquals(1, session.query("MATCH (a:ForeName) <-- (n:Person) --> (b:ForeName) RETURN count(DISTINCT n)", new HashMap<>()).queryResults().iterator().next().get("count(DISTINCT n)"));
     }
-
 
     @Test
     public void testSaveSinglePerson(){
@@ -118,16 +117,6 @@ public class TttNeo4jApplicationTests {
                     put("name", "Jean");
                 }})
                 .queryResults().iterator().next().get("count(DISTINCT n)"));
-    }
-
-    private List<Person> getPeopleFromMongoCollection(String collectionName) {
-        return mongoTemplate.find(
-                new BasicQuery(
-                        new BasicDBObject(),
-                        new BasicDBObject()),
-                Person.class,
-                collectionName);
-
     }
 
 

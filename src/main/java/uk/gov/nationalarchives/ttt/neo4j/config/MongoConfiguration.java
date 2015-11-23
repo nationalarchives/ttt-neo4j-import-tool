@@ -26,4 +26,15 @@ public class MongoConfiguration extends AbstractMongoConfiguration {
     public Mongo mongo() throws Exception {
         return new MongoClient(singletonList(new ServerAddress("127.0.0.1", 27017)));
     }
+
+
+    private static String personCollectionName = "WO_98_Discovery_A";
+
+    public static String getPersonCollectionName() {
+        return personCollectionName;
+    }
+
+    public static void setPersonCollectionName(String personCollectionName) {
+        MongoConfiguration.personCollectionName = personCollectionName;
+    }
 }

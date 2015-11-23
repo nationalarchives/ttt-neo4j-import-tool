@@ -9,7 +9,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import uk.gov.nationalarchives.ttt.neo4j.dao.neo4j.PersonGraphRepository;
-import uk.gov.nationalarchives.ttt.neo4j.domain.graphperson.constants.EventType;
 import uk.gov.nationalarchives.ttt.neo4j.domain.graphperson.generated.*;
 
 import java.util.HashMap;
@@ -276,7 +275,7 @@ public class PersonGraphRepositoryImpl implements PersonGraphRepository {
         parameters.put("startNodeId", startNodeId);
         parameters.put("endNodeId", endNodeId);
 
-        parameters.put("relationshipProperties", relationshipProperties);
+        parameters.putAll(relationshipProperties);
 
         String cypherQuery = "MATCH (startNode), " +
                 "(endNode)" +
