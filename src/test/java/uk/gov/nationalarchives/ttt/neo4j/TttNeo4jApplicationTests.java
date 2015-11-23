@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
-import uk.gov.nationalarchives.ttt.neo4j.config.MongoConfiguration;
 import uk.gov.nationalarchives.ttt.neo4j.dao.mongo.PersonDocumentRepository;
 import uk.gov.nationalarchives.ttt.neo4j.dao.neo4j.PersonGraphRepository;
 import uk.gov.nationalarchives.ttt.neo4j.domain.graphperson.generated.*;
@@ -42,9 +41,9 @@ public class TttNeo4jApplicationTests {
         emptyDatabase();
 
         List<Person> people = new ArrayList<>();
-        MongoConfiguration.setPersonCollectionName("WO_98_Discovery_A");
+        personDocumentRepository.setPersonCollectionName("WO_98_Discovery_A");
         people.addAll(personDocumentRepository.findAll());
-        MongoConfiguration.setPersonCollectionName("WO_98_Discovery_B");
+        personDocumentRepository.setPersonCollectionName("WO_98_Discovery_B");
         people.addAll(personDocumentRepository.findAll());
         Assert.assertEquals(4, people.size());
 

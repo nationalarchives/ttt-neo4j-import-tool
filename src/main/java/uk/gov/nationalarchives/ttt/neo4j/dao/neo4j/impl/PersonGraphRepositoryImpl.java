@@ -147,7 +147,7 @@ public class PersonGraphRepositoryImpl implements PersonGraphRepository {
         nodeProperties.put("month", month.getValue());
         nodeProperties.put("year", year.getValue());
 
-        return createNode(day.getClass().getSimpleName(), nodeProperties);
+        return mergeNode(day.getClass().getSimpleName(), nodeProperties);
     }
 
     private Integer mergeMonth(Year year, Month month) {
@@ -155,14 +155,14 @@ public class PersonGraphRepositoryImpl implements PersonGraphRepository {
         nodeProperties.put("value", month.getValue());
         nodeProperties.put("year", year.getValue());
 
-        return createNode(month.getClass().getSimpleName(), nodeProperties);
+        return mergeNode(month.getClass().getSimpleName(), nodeProperties);
     }
 
     private Integer mergeYear(Year node) {
         Map<String, Object> nodeProperties = new HashMap<>();
         nodeProperties.put("value", node.getValue());
 
-        return createNode(node.getClass().getSimpleName(), nodeProperties);
+        return mergeNode(node.getClass().getSimpleName(), nodeProperties);
     }
 
     private void createEventToDateRelationship(Integer eventOutputId, HashMap<String, Object> stringObjectHashMap, Integer dateOutputId, Year year, Month month, Day day) {

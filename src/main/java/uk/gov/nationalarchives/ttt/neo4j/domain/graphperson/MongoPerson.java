@@ -6,6 +6,6 @@ import uk.gov.nationalarchives.ttt.neo4j.domain.graphperson.generated.Person;
 /**
  * Created by jcharlet on 11/23/15.
  */
-@Document(collection = "#{mongoConfiguration.getPersonCollectionName()}")
+@Document(collection = "#{personDocumentRepository.getPersonCollectionName()}")
 public class MongoPerson extends Person{
 }
