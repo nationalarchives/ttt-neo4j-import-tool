@@ -1,9 +1,7 @@
 package uk.gov.nationalarchives.ttt.neo4j.dao.neo4j.impl;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.neo4j.ogm.session.Session;
 import org.neo4j.ogm.session.result.Result;
-import org.neo4j.ogm.session.transaction.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,95 +28,7 @@ public class PersonGraphRepositoryImpl implements PersonGraphRepository {
     }
 
     @Override
-    public void createOrMergePersonGraph(Person person) {
-        final Transaction transaction = session.beginTransaction();
-        try {
-            Integer personOutputId = createPerson(person);
-
-
-            if (!CollectionUtils.isEmpty(person.getHasFamilyNames())) {
-                for (HasFamilyName hasFamilyName : person.getHasFamilyNames()) {
-                    final Integer familyNameOutputId = mergeFamilyName(hasFamilyName.getFamilyName());
-
-                    createRelationshipBetweenPersonAndFamilyName(personOutputId, hasFamilyName, familyNameOutputId);
-                }
-            }
-
-            if (!CollectionUtils.isEmpty(person.getHasForeNames())) {
-                for (HasForeName hasForeName : person.getHasForeNames()) {
-                    final Integer foreNameOutputId = mergeForeName(hasForeName.getForeName());
-
-                    createRelationshipBetweenPersonAndForeName(personOutputId, hasForeName, foreNameOutputId);
-                }
-            }
-
-
-            if (!CollectionUtils.isEmpty(person.getHasReferences())) {
-                for (HasReference hasReference : person.getHasReferences()) {
-                    final Integer referenceOutputId = mergeReference(hasReference.getReference());
-
-                    createRelationship(personOutputId, new HashMap<String, Object>(), referenceOutputId,
-                            "HAS_REFERENCE");
-                }
-            }
-
-            if (!CollectionUtils.isEmpty(person.getHasEvents())) {
-                for (HasEvent hasEvent : person.getHasEvents()) {
-                    if (hasEvent.getEvent().getHasYear() == null) {
-                        continue;
-                    }
-
-                    final Integer eventOutputId = createEvent(hasEvent.getEvent());
-
-                    createRelationship(personOutputId, new HashMap<String, Object>(), eventOutputId,
-                            "HAS_EVENT");
-
-                    Year year = null;
-                    if (hasEvent.getEvent().getHasYear() != null) {
-                        year = hasEvent.getEvent().getHasYear().getYear();
-                    }
-                    Month month = null;
-                    if (hasEvent.getEvent().getHasMonth() != null) {
-                        month = hasEvent.getEvent().getHasMonth().getMonth();
-                    }
-                    Day day = null;
-                    if (hasEvent.getEvent().getHasDay() != null) {
-                        day = hasEvent.getEvent().getHasDay().getDay();
-                    }
-
-                    final Integer dateOutputId = mergeDateNodesAndTheirSubRelationships(year, month, day);
-
-                    createEventToDateRelationship(eventOutputId, new HashMap<String, Object>(), dateOutputId, year, month, day);
-                }
-
-            }
-
-            if (person.getInContainer() != null) {
-                InContainer inContainer = person.getInContainer();
-                if (inContainer.getDocument() != null) {
-                    final Integer documentId = mergeDocument(inContainer.getDocument());
-
-                    createRelationship(personOutputId, new HashMap<String, Object>(), documentId,
-                            "IN_CONTAINER");
-                }
-                if (inContainer.getSource() != null) {
-                    final Integer sourceId = mergeSource(inContainer.getSource());
-
-                    createRelationship(personOutputId, new HashMap<String, Object>(), sourceId,
-                            "IN_CONTAINER");
-                }
-            }
-
-            transaction.commit();
-        } catch (Exception e) {
-            logger.error("an error occured while creating the person graph", e);
-        } finally {
-            transaction.close();
-        }
-
-    }
-
-    private Integer mergeDateNodesAndTheirSubRelationships(Year year, Month month, Day day) {
+    public Integer mergeDateNodesAndTheirSubRelationships(Year year, Month month, Day day) {
         final Integer dateOutputId = null;
 
         final Integer yearId = mergeYear(year);
@@ -165,7 +75,8 @@ public class PersonGraphRepositoryImpl implements PersonGraphRepository {
         return mergeNode(node.getClass().getSimpleName(), nodeProperties);
     }
 
-    private void createEventToDateRelationship(Integer eventOutputId, HashMap<String, Object> stringObjectHashMap, Integer dateOutputId, Year year, Month month, Day day) {
+    @Override
+    public void createEventToDateRelationship(Integer eventOutputId, HashMap<String, Object> stringObjectHashMap, Integer dateOutputId, Year year, Month month, Day day) {
         if (day != null) {
             createRelationship(eventOutputId, new HashMap<String, Object>(), dateOutputId,
                     "HAS_DAY");
@@ -178,7 +89,8 @@ public class PersonGraphRepositoryImpl implements PersonGraphRepository {
         }
     }
 
-    private Integer createEvent(Event node) {
+    @Override
+    public Integer createEvent(Event node) {
         Map<String, Object> nodeProperties = new HashMap<>();
         if (node.getType() != null) {
             nodeProperties.put("type", node.getType());
@@ -190,7 +102,8 @@ public class PersonGraphRepositoryImpl implements PersonGraphRepository {
         return createNode(node.getClass().getSimpleName(), nodeProperties);
     }
 
-    private void createRelationshipBetweenPersonAndForeName(Integer personOutputId, HasForeName hasForeName, Integer foreNameOutputId) {
+    @Override
+    public void createRelationshipBetweenPersonAndForeName(Integer personOutputId, HasForeName hasForeName, Integer foreNameOutputId) {
         Map<String, Object> relationshipProperties = new HashMap<>();
         if (hasForeName.getOrder() != null) {
             relationshipProperties.put("order", hasForeName.getOrder());
@@ -198,7 +111,8 @@ public class PersonGraphRepositoryImpl implements PersonGraphRepository {
         createRelationship(personOutputId, relationshipProperties, foreNameOutputId, "HAS_FORE_NAME");
     }
 
-    private void createRelationshipBetweenPersonAndFamilyName(Integer personOutputId, HasFamilyName hasFamilyName, Integer familyNameOutputId) {
+    @Override
+    public void createRelationshipBetweenPersonAndFamilyName(Integer personOutputId, HasFamilyName hasFamilyName, Integer familyNameOutputId) {
         Map<String, Object> relationshipProperties = new HashMap<>();
         if (hasFamilyName.getOrder() != null) {
             relationshipProperties.put("order", hasFamilyName.getOrder());
@@ -206,7 +120,8 @@ public class PersonGraphRepositoryImpl implements PersonGraphRepository {
         createRelationship(personOutputId, relationshipProperties, familyNameOutputId, "HAS_FAMILY_NAME");
     }
 
-    private Integer mergeSource(Source node) {
+    @Override
+    public Integer mergeSource(Source node) {
         Map<String, Object> nodeProperties = new HashMap<>();
         nodeProperties.put("name", node.getName());
         if (node.getType() != null) {
@@ -219,7 +134,8 @@ public class PersonGraphRepositoryImpl implements PersonGraphRepository {
         return mergeNode(node.getClass().getSimpleName(), nodeProperties);
     }
 
-    private Integer mergeDocument(Document node) {
+    @Override
+    public Integer mergeDocument(Document node) {
         Map<String, Object> nodeProperties = new HashMap<>();
         nodeProperties.put("name", node.getName());
         if (node.getType() != null) {
@@ -232,7 +148,8 @@ public class PersonGraphRepositoryImpl implements PersonGraphRepository {
         return mergeNode(node.getClass().getSimpleName(), nodeProperties);
     }
 
-    private Integer mergeReference(Reference node) {
+    @Override
+    public Integer mergeReference(Reference node) {
         Map<String, Object> nodeProperties = new HashMap<>();
         nodeProperties.put("name", node.getName());
         if (node.getType() != null) {
@@ -245,7 +162,8 @@ public class PersonGraphRepositoryImpl implements PersonGraphRepository {
         return mergeNode(node.getClass().getSimpleName(), nodeProperties);
     }
 
-    private Integer mergeForeName(ForeName node) {
+    @Override
+    public Integer mergeForeName(ForeName node) {
         Map<String, Object> nodeProperties = new HashMap<>();
         nodeProperties.put("name", node.getName());
         if (node.getType() != null) {
@@ -255,7 +173,8 @@ public class PersonGraphRepositoryImpl implements PersonGraphRepository {
         return mergeNode(node.getClass().getSimpleName(), nodeProperties);
     }
 
-    private Integer mergeFamilyName(FamilyName node) {
+    @Override
+    public Integer mergeFamilyName(FamilyName node) {
         HashMap<String, Object> nodeProperties = new HashMap<>();
 
         nodeProperties.put("name", node.getName());
@@ -265,7 +184,8 @@ public class PersonGraphRepositoryImpl implements PersonGraphRepository {
         return mergeNode(node.getClass().getSimpleName(), nodeProperties);
     }
 
-    private Integer createPerson(Person person) {
+    @Override
+    public Integer createPerson(Person person) {
         Map<String, Object> personProperties = getPersonProperties(person);
         return createNode("Person", personProperties);
     }
@@ -295,7 +215,9 @@ public class PersonGraphRepositoryImpl implements PersonGraphRepository {
                 parameters);
     }
 
-    private void createRelationship(Integer startNodeId, Map<String, Object> relationshipProperties, Integer endNodeId, String relationshipLabel) {
+
+    @Override
+    public void createRelationship(Integer startNodeId, Map<String, Object> relationshipProperties, Integer endNodeId, String relationshipLabel) {
         saveRelationship(startNodeId, relationshipProperties, endNodeId, relationshipLabel, "CREATE");
     }
 

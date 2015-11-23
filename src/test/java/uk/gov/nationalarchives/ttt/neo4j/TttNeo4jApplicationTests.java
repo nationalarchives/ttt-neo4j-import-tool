@@ -13,9 +13,9 @@ import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import uk.gov.nationalarchives.ttt.neo4j.dao.mongo.PersonDocumentRepository;
-import uk.gov.nationalarchives.ttt.neo4j.dao.neo4j.PersonGraphRepository;
 import uk.gov.nationalarchives.ttt.neo4j.domain.graphperson.MongoPerson;
 import uk.gov.nationalarchives.ttt.neo4j.domain.graphperson.generated.*;
+import uk.gov.nationalarchives.ttt.neo4j.service.PersonGraphService;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -31,7 +31,7 @@ public class TttNeo4jApplicationTests {
     Session session;
 
     @Autowired
-    PersonGraphRepository personGraphRepository;
+    PersonGraphService personGraphService;
 
     @Autowired
     PersonDocumentRepository personDocumentRepository;
@@ -53,7 +53,7 @@ public class TttNeo4jApplicationTests {
         Assert.assertEquals(4, people.size());
 
         for (Person person:people){
-            personGraphRepository.createOrMergePersonGraph(person);
+            personGraphService.createOrMergePersonGraph(person);
         }
 
         Assert.assertEquals(4, session.query("MATCH (n:Person) RETURN count(n)", new HashMap<>()).queryResults().iterator().next().get("count(n)"));
@@ -74,7 +74,7 @@ public class TttNeo4jApplicationTests {
 
         int counter=0;
         for (MongoPerson person : personDocumentRepository.findAll()) {
-            personGraphRepository.createOrMergePersonGraph(person);
+            personGraphService.createOrMergePersonGraph(person);
             counter++;
             if(counter>=MAX_ELEMENTS){
                 break;
@@ -131,7 +131,7 @@ public class TttNeo4jApplicationTests {
         hasEvent.setEvent(event);
         person.setHasEvents(Arrays.asList(hasEvent));
 
-        personGraphRepository.createOrMergePersonGraph(person);
+        personGraphService.createOrMergePersonGraph(person);
 
         Assert.assertEquals(1, session.query("MATCH (n:Person) RETURN count(n)", new HashMap<>()).queryResults()
                 .iterator().next().get("count(n)"));
