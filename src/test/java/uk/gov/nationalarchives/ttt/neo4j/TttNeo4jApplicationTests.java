@@ -13,9 +13,8 @@ import org.springframework.data.mongodb.core.query.BasicQuery;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import uk.gov.nationalarchives.ttt.neo4j.dao.neo4j.PersonGraphRepository;
-import uk.gov.nationalarchives.ttt.neo4j.domain.graphperson.generated.ForeName;
-import uk.gov.nationalarchives.ttt.neo4j.domain.graphperson.generated.HasForeName;
-import uk.gov.nationalarchives.ttt.neo4j.domain.graphperson.generated.Person;
+import uk.gov.nationalarchives.ttt.neo4j.domain.graphperson.constants.EventType;
+import uk.gov.nationalarchives.ttt.neo4j.domain.graphperson.generated.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -62,7 +61,7 @@ public class TttNeo4jApplicationTests {
 
 
     @Test
-    public void testSave1PersonWith1ForeName(){
+    public void testSaveSinglePerson(){
         emptyDatabase();
 
 
@@ -80,6 +79,32 @@ public class TttNeo4jApplicationTests {
         HasForeName hasForeName = new HasForeName();
         hasForeName.setForeName(foreName);
         person.setHasForeNames(Arrays.asList(hasForeName));
+
+        Event event = new Event();
+        event.setType("BIRTH");
+
+        HasYear hasYear = new HasYear();
+        Year year = new Year();
+        year.setValue(2015d);
+        hasYear.setYear(year);
+        event.setHasYear(hasYear);
+
+        HasMonth hasMonth = new HasMonth();
+        Month month = new Month();
+        month.setValue(08d);
+        hasMonth.setMonth(month);
+        event.setHasMonth(hasMonth);
+
+
+        HasDay hasDay = new HasDay();
+        Day day = new Day();
+        day.setValue(31d);
+        hasDay.setDay(day);
+        event.setHasDay(hasDay);
+
+        HasEvent hasEvent = new HasEvent();
+        hasEvent.setEvent(event);
+        person.setHasEvents(Arrays.asList(hasEvent));
 
         personGraphRepository.createOrMergePersonGraph(person);
 
