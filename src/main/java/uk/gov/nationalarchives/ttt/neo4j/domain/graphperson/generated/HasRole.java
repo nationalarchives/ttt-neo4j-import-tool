@@ -1,5 +1,5 @@
 
-package uk.gov.nationalarchives.ttt.linker.model.graphperson.generated;
+package uk.gov.nationalarchives.ttt.neo4j.domain.graphperson.generated;
 
 import java.util.HashMap;
 import java.util.Map;
