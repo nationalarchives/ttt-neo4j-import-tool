@@ -61,24 +61,23 @@ public class TttNeo4jApplicationTests extends BaseTestClass {
         Event event = new Event();
         event.setType("BIRTH");
 
-        HasYear hasYear = new HasYear();
-        Year year = new Year();
-        year.setValue(2015d);
-        hasYear.setYear(year);
-        event.setHasYear(hasYear);
-
-        HasMonth hasMonth = new HasMonth();
-        Month month = new Month();
-        month.setValue(08d);
-        hasMonth.setMonth(month);
-        event.setHasMonth(hasMonth);
-
-
         HasDay hasDay = new HasDay();
         Day day = new Day();
         day.setValue(31d);
         hasDay.setDay(day);
         event.setHasDay(hasDay);
+
+        HasMonth hasMonth = new HasMonth();
+        Month month = new Month();
+        month.setValue(08d);
+        hasMonth.setMonth(month);
+        day.setHasMonth(hasMonth);
+
+        HasYear hasYear = new HasYear();
+        Year year = new Year();
+        year.setValue(2015d);
+        hasYear.setYear(year);
+        month.setHasYear(hasYear);
 
         HasEvent hasEvent = new HasEvent();
         hasEvent.setEvent(event);

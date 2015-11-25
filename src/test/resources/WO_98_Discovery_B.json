@@ -11,17 +11,17 @@
 		{
 			"certain": true,
 			"event": {
-              "hasYear":
+              "hasDay":
               {
                 "type": "EXACT",
-                "year": {
-                  "value": 1892,
+                "day": {
+                  "value": 15,
                   "hasMonth": {
                     "month": {
                       "value": 6,
-                      "hasDay": {
-                        "day": {
-                          "value": 15
+                      "hasYear": {
+                        "year": {
+                          "value": 1892
                         }
                       }
                     }
@@ -105,17 +105,17 @@
 		{
 			"certain": true,
 			"event": {
-            "hasYear":
-					{
-                      "type": "EXACT",
-                      "year": {
-                        "value": 1891,
-                        "hasMonth": {
-                          "month": {
-                            "value": 5,
-                            "hasDay": {
-						"day": {
-							"value": 13
+              "hasDay":
+              {
+                "type": "EXACT",
+                "day": {
+                  "value": 13,
+                  "hasMonth": {
+                    "month": {
+                      "value": 5,
+                      "hasYear": {
+                        "year": {
+                          "value": 1891
 						}
 					}
                           }

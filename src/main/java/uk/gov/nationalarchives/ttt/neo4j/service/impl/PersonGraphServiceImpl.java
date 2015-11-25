@@ -164,5 +164,13 @@ public class PersonGraphServiceImpl implements PersonGraphService {
                 }
             });
         }
+
+        executorService.shutdown();
+    }
+
+    @Override
+    public void emptyGraphDatabase() {
+        personGraphRepository.emptyGraphDatabase();
+
     }
 }

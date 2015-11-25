@@ -16,33 +16,35 @@ public class PersonCentralisedBrowser {
 
     Logger logger = LoggerFactory.getLogger(getClass());
 
-    final long maxElements;
+    final long nbOfElementsToProcess;
     final int pageSize;
     private final PersonDocumentRepository personDocumentRepository;
 
     public static AtomicInteger pageNumber = new AtomicInteger(0);
 
-    public PersonCentralisedBrowser(Integer maxElements, int pageSize, PersonDocumentRepository
+    public PersonCentralisedBrowser(Integer limit, int pageSize, PersonDocumentRepository
             personDocumentRepository) {
         this.personDocumentRepository = personDocumentRepository;
         this.pageSize = pageSize;
-        if(maxElements!=null){
-            this.maxElements = maxElements;
+
+        final long peopleCount = personDocumentRepository.count();
+        if(limit!=null && limit<peopleCount){
+            this.nbOfElementsToProcess = limit;
         }else{
-            this.maxElements = personDocumentRepository.count();
+            this.nbOfElementsToProcess = peopleCount;
         }
     }
 
     public Page<MongoPerson> getNextPerson() {
         Integer pageNumber =  this.pageNumber.getAndIncrement();
-        if(pageNumber*pageSize>=maxElements){
+        if(pageNumber*pageSize>= nbOfElementsToProcess){
             logger.info("no more documents to browse");
             return null;
         }
-        logger.info("page no " + pageNumber + ", did " + (100*pageNumber*pageSize/maxElements) + "% so " +
+        logger.info("page no " + pageNumber + ", did " + (100*pageNumber*pageSize/ nbOfElementsToProcess) + "% so " +
                 "far," +
                 " "+
-                (maxElements-pageNumber*pageSize)
+                (nbOfElementsToProcess -pageNumber*pageSize)
                 +" " +
                 "elements" +
                 " left");

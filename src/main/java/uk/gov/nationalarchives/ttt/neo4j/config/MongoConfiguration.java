@@ -15,16 +15,20 @@ import static java.util.Collections.singletonList;
 @Configuration
 public class MongoConfiguration extends AbstractMongoConfiguration {
 
+    public static final String HOST = "127.0.0.1";
+    public static final int PORT = 27017;
+    public static final String DATABASE = "ttt";
+
     @Override
     public String getDatabaseName() {
-        return "ttt";
+        return DATABASE;
     }
 
 
     @Override
     @Bean
     public Mongo mongo() throws Exception {
-        return new MongoClient(singletonList(new ServerAddress("127.0.0.1", 27017)));
+        return new MongoClient(singletonList(new ServerAddress(HOST, PORT)));
     }
 
 }

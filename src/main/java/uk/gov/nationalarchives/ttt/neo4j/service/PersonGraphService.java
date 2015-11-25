@@ -11,4 +11,6 @@ public interface PersonGraphService {
     void savePersonGraph(Person person);
 
     void bulkSavePeopleGraphFromMongoCollection(String personCollectionName, Integer limit);
+
+    void emptyGraphDatabase();
 }

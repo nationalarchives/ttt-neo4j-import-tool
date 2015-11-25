@@ -33,4 +33,6 @@ public interface PersonGraphRepository {
     Integer mergeSource(Source source);
 
     void createRelationship(Integer startNodeId, Map<String, Object> relationshipProperties, Integer endNodeId, String relationshipLabel);
+
+    void emptyGraphDatabase();
 }

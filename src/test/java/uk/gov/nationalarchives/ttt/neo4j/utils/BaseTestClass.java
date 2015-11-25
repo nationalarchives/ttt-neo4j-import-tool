@@ -8,16 +8,15 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.web.WebAppConfiguration;
-import uk.gov.nationalarchives.ttt.neo4j.TttNeo4jApplication;
+import uk.gov.nationalarchives.ttt.neo4j.TestConfiguration;
 import uk.gov.nationalarchives.ttt.neo4j.dao.mongo.PersonDocumentRepository;
 import uk.gov.nationalarchives.ttt.neo4j.service.PersonGraphService;
 
 import java.util.HashMap;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = TttNeo4jApplication.class)
-@WebAppConfiguration
+@SpringApplicationConfiguration(classes = TestConfiguration.class)
+//@WebAppConfiguration
 public abstract class BaseTestClass {
     @Autowired
     protected Session session;

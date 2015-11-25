@@ -242,6 +242,11 @@ public class PersonGraphRepositoryImpl implements PersonGraphRepository {
         saveRelationship(startNodeId, relationshipProperties, endNodeId, relationshipLabel, "CREATE");
     }
 
+    @Override
+    public void emptyGraphDatabase() {
+        session.query("MATCH (n) DETACH DELETE n", new HashMap<String,Object>());
+    }
+
     private void mergeRelationship(Integer startNodeId, Map<String, Object> relationshipProperties, Integer endNodeId, String relationshipLabel) {
         saveRelationship(startNodeId, relationshipProperties, endNodeId, relationshipLabel, "MERGE");
     }
