@@ -100,12 +100,15 @@ public class TttNeo4jApplicationTests extends BaseTestClass {
 
 
     public static final int MAX_ELEMENTS = 20;
+    public static final int PAGE_SIZE = 10;
+//    public static final int MAX_ELEMENTS = 1000;
+//    public static final int PAGE_SIZE = 50;
 
     @Test
     public void testBulkSavePeopleIntoNeo4j() throws InterruptedException {
         final Date start = Calendar.getInstance().getTime();
 
-        PersonGraphServiceImpl.PAGE_SIZE=10;
+        PersonGraphServiceImpl.PAGE_SIZE=PAGE_SIZE;
         personGraphService.bulkSavePeopleGraphFromMongoCollection("ADM337_Discovery_eval", MAX_ELEMENTS);
 
         final Date end = Calendar.getInstance().getTime();

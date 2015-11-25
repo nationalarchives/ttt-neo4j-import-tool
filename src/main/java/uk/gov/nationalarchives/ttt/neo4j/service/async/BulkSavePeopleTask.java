@@ -35,7 +35,7 @@ public class BulkSavePeopleTask implements Runnable {
                         personGraphService.savePersonGraph(person);
                         Thread.sleep(50);
                     } catch (Exception e) {
-                        logger.error("ERROR", e);
+                        logger.error("error while saving that person", e);
                     }
                 });
             }

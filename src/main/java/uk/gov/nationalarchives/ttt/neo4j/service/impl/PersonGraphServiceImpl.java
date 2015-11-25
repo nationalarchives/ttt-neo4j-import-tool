@@ -79,7 +79,8 @@ public class PersonGraphServiceImpl implements PersonGraphService {
 
         if (!CollectionUtils.isEmpty(person.getHasEvents())) {
             for (HasEvent hasEvent : person.getHasEvents()) {
-                if (hasEvent.getEvent().getHasYear() == null) {
+                if (hasEvent.getEvent().getHasYear() == null && hasEvent.getEvent().getHasMonth()==null && hasEvent
+                        .getEvent().getHasDay()==null) {
                     continue;
                 }
 

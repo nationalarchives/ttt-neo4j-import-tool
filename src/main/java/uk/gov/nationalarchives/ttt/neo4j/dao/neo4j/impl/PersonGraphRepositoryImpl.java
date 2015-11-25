@@ -29,26 +29,44 @@ public class PersonGraphRepositoryImpl implements PersonGraphRepository {
 
     @Override
     public Integer mergeDateNodesAndTheirSubRelationships(Year year, Month month, Day day) {
-        final Integer dateOutputId = null;
+        try {
+            if (day != null) {
+                Month monthFromCompleteDate = day.getHasMonth().getMonth();
+                Year yearFromCompleteDate = monthFromCompleteDate.getHasYear().getYear();
 
-        final Integer yearId = mergeYear(year);
+                final Integer yearId = mergeYear(yearFromCompleteDate);
 
-        if (month == null) {
+                final Integer monthId = mergeMonth(yearFromCompleteDate,
+                        monthFromCompleteDate);
+                mergeRelationship(monthId, new HashMap<String, Object>(), yearId,
+                        "HAS_YEAR");
+
+                final Integer dayId = mergeDay(yearFromCompleteDate,
+                        monthFromCompleteDate,
+                        day);
+                mergeRelationship(dayId, new HashMap<String, Object>(), monthId,
+                        "HAS_MONTH");
+                return dayId;
+
+            } else if (month != null) {
+                Year yearFromPartialDate = month.getHasYear().getYear();
+                final Integer yearId = mergeYear(yearFromPartialDate);
+
+                final Integer monthId = mergeMonth(yearFromPartialDate, month);
+
+                mergeRelationship(monthId, new HashMap<String, Object>(), yearId,
+                        "HAS_YEAR");
+                return monthId;
+
+            }
+            final Integer yearId = mergeYear(year);
             return yearId;
+
+
+        } catch (NullPointerException e) {
+            throw new IllegalArgumentException("the date was incorrectly formatted and thus raised a NPE", e);
         }
 
-        final Integer monthId = mergeMonth(year, month);
-        mergeRelationship(monthId, new HashMap<String, Object>(), yearId,
-                "HAS_YEAR");
-
-        if (day == null) {
-            return monthId;
-        }
-
-        final Integer dayId = mergeDay(year, month, day);
-        mergeRelationship(dayId, new HashMap<String, Object>(), monthId,
-                "HAS_MONTH");
-        return dayId;
     }
 
     private Integer mergeDay(Year year, Month month, Day day) {
@@ -143,6 +161,9 @@ public class PersonGraphRepositoryImpl implements PersonGraphRepository {
         }
         if (node.getRef() != null) {
             nodeProperties.put("genre", node.getRef());
+        }
+        if (node.getURL() != null) {
+            nodeProperties.put("URL", node.getURL());
         }
 
         return mergeNode(node.getClass().getSimpleName(), nodeProperties);
