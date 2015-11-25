@@ -18,7 +18,6 @@ import org.springframework.data.neo4j.config.Neo4jConfiguration;
 import org.springframework.data.neo4j.repository.config.EnableNeo4jRepositories;
 import org.springframework.data.neo4j.server.Neo4jServer;
 import org.springframework.data.neo4j.server.RemoteServer;
-import org.springframework.data.neo4j.template.Neo4jTemplate;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @Configuration
@@ -26,9 +25,13 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @EnableTransactionManagement
 public class TTTNeo4jConfiguration extends Neo4jConfiguration {
 
+    public static final String HOST = "http://localhost:7474";
+    public static final String USER = "neo4j";
+    public static final String PASSWORD = "jcharlet";
+
     @Bean
     public Neo4jServer neo4jServer() {
-        return new RemoteServer("http://localhost:7474", "neo4j", "jcharlet");
+        return new RemoteServer(HOST, USER, PASSWORD);
     }
 
     @Bean

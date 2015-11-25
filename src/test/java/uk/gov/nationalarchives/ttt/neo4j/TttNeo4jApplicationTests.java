@@ -1,49 +1,25 @@
 package uk.gov.nationalarchives.ttt.neo4j;
 
 import org.apache.commons.collections.IteratorUtils;
-import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.neo4j.ogm.session.Session;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.web.WebAppConfiguration;
-import uk.gov.nationalarchives.ttt.neo4j.dao.mongo.PersonDocumentRepository;
 import uk.gov.nationalarchives.ttt.neo4j.domain.graphperson.MongoPerson;
 import uk.gov.nationalarchives.ttt.neo4j.domain.graphperson.generated.*;
-import uk.gov.nationalarchives.ttt.neo4j.service.PersonGraphService;
+import uk.gov.nationalarchives.ttt.neo4j.service.impl.PersonGraphServiceImpl;
+import uk.gov.nationalarchives.ttt.neo4j.utils.BaseTestClass;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = TttNeo4jApplication.class)
-@WebAppConfiguration
-public class TttNeo4jApplicationTests {
+public class TttNeo4jApplicationTests extends BaseTestClass {
 
-    @Autowired
-    Session session;
-
-    @Autowired
-    PersonGraphService personGraphService;
-
-    @Autowired
-    PersonDocumentRepository personDocumentRepository;
-    private Logger logger = LoggerFactory.getLogger(getClass());
-
-    private void emptyDatabase() {
-        session.query("MATCH (n) DETACH DELETE n", new HashMap<String,Object>());
+    @Before
+    public void initDataset(){
+        emptyNeo4jDatabase();
     }
 
     @Test
     public void testSavePeopleFromMongoIntoNeo4j() {
-        emptyDatabase();
 
         List<MongoPerson> people = new ArrayList<>();
         personDocumentRepository.setPersonCollectionName("WO_98_Discovery_A");
@@ -53,7 +29,7 @@ public class TttNeo4jApplicationTests {
         Assert.assertEquals(4, people.size());
 
         for (Person person:people){
-            personGraphService.createOrMergePersonGraph(person);
+            personGraphService.savePersonGraph(person);
         }
 
         Assert.assertEquals(4, session.query("MATCH (n:Person) RETURN count(n)", new HashMap<>()).queryResults().iterator().next().get("count(n)"));
@@ -63,32 +39,9 @@ public class TttNeo4jApplicationTests {
         Assert.assertEquals(1, session.query("MATCH (a:ForeName) <-- (n:Person) --> (b:ForeName) RETURN count(DISTINCT n)", new HashMap<>()).queryResults().iterator().next().get("count(DISTINCT n)"));
     }
 
-//    @Test
-    public void testSavePeopleFromHugeCollectionIntoNeo4j() {
-        emptyDatabase();
-
-        logger.info("Start");
-
-        final int MAX_ELEMENTS=1000;
-        personDocumentRepository.setPersonCollectionName("ADM337_Discovery_eval");
-
-        int counter=0;
-        for (MongoPerson person : personDocumentRepository.findAll()) {
-            personGraphService.createOrMergePersonGraph(person);
-            counter++;
-            if(counter>=MAX_ELEMENTS){
-                break;
-            }
-        }
-        logger.info("End");
-
-        Assert.assertEquals(MAX_ELEMENTS, session.query("MATCH (n:Person) RETURN count(n)", new HashMap<>()).queryResults().iterator().next().get("count(n)"));
-    }
 
     @Test
     public void testSaveSinglePerson(){
-        emptyDatabase();
-
 
         Person person = new Person();
         person.setRef("TEST_1");
@@ -131,7 +84,7 @@ public class TttNeo4jApplicationTests {
         hasEvent.setEvent(event);
         person.setHasEvents(Arrays.asList(hasEvent));
 
-        personGraphService.createOrMergePersonGraph(person);
+        personGraphService.savePersonGraph(person);
 
         Assert.assertEquals(1, session.query("MATCH (n:Person) RETURN count(n)", new HashMap<>()).queryResults()
                 .iterator().next().get("count(n)"));
@@ -146,8 +99,23 @@ public class TttNeo4jApplicationTests {
     }
 
 
-    public long generateNeo4jId(String name) {
-        return Math.abs(new HashCodeBuilder().append(name).toHashCode());
-    }
+    public static final int MAX_ELEMENTS = 20;
 
+    @Test
+    public void testBulkSavePeopleIntoNeo4j() throws InterruptedException {
+        final Date start = Calendar.getInstance().getTime();
+
+        PersonGraphServiceImpl.PAGE_SIZE=10;
+        personGraphService.bulkSavePeopleGraphFromMongoCollection("ADM337_Discovery_eval", MAX_ELEMENTS);
+
+        final Date end = Calendar.getInstance().getTime();
+
+        final long diffSeconds = (end.getTime() - start.getTime()) / 1000 % 60;
+
+
+        logger.info("testBulkSavePeopleIntoNeo4j took " + diffSeconds + " seconds with " + PersonGraphServiceImpl.NB_THREADS + "" +
+                " thread(s)");
+
+        Assert.assertEquals(MAX_ELEMENTS, session.query("MATCH (n:Person) RETURN count(n)", new HashMap<>()).queryResults().iterator().next().get("count(n)"));
+    }
 }
