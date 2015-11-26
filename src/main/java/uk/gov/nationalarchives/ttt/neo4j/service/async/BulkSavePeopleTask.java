@@ -13,13 +13,15 @@ public class BulkSavePeopleTask implements Runnable {
 
     Logger logger = LoggerFactory.getLogger(getClass());
 
-    final PersonCentralisedBrowser personCentralisedBrowser;
-    final PersonGraphService personGraphService;
+    private final PersonCentralisedBrowser personCentralisedBrowser;
+    private final PersonGraphService personGraphService;
+    private final String source;
 
 
-    public BulkSavePeopleTask(PersonCentralisedBrowser personCentralisedBrowser, PersonGraphService personGraphService) {
+    public BulkSavePeopleTask(PersonCentralisedBrowser personCentralisedBrowser, PersonGraphService personGraphService, String source) {
         this.personCentralisedBrowser = personCentralisedBrowser;
         this.personGraphService = personGraphService;
+        this.source = source;
     }
 
 
@@ -32,7 +34,7 @@ public class BulkSavePeopleTask implements Runnable {
                 personPage.getContent().forEach(person -> {
                     logger.info("saving person: " + person.getRef());
                     try {
-                        personGraphService.savePersonGraph(person);
+                        personGraphService.savePersonGraph(person, source);
                         Thread.sleep(50);
                     } catch (Exception e) {
                         logger.error("error while saving that person", e);

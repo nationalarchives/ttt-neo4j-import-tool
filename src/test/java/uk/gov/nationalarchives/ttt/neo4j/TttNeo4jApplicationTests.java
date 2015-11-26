@@ -4,6 +4,9 @@ import org.apache.commons.collections.IteratorUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import uk.gov.nationalarchives.ttt.neo4j.domain.Link;
 import uk.gov.nationalarchives.ttt.neo4j.domain.graphperson.MongoPerson;
 import uk.gov.nationalarchives.ttt.neo4j.domain.graphperson.generated.*;
 import uk.gov.nationalarchives.ttt.neo4j.service.impl.PersonGraphServiceImpl;
@@ -19,24 +22,38 @@ public class TttNeo4jApplicationTests extends BaseTestClass {
     }
 
     @Test
-    public void testSavePeopleFromMongoIntoNeo4j() {
+    public void testSavePeopleAndLinksFromMongoIntoNeo4j() {
 
-        List<MongoPerson> people = new ArrayList<>();
         personDocumentRepository.setPersonCollectionName("WO_98_Discovery_A");
-        people.addAll(IteratorUtils.toList(personDocumentRepository.findAll().iterator()));
-        personDocumentRepository.setPersonCollectionName("WO_98_Discovery_B");
-        people.addAll(IteratorUtils.toList(personDocumentRepository.findAll().iterator()));
-        Assert.assertEquals(4, people.size());
-
+        List<MongoPerson> people = IteratorUtils.toList(personDocumentRepository.findAll().iterator());
         for (Person person:people){
-            personGraphService.savePersonGraph(person);
+            personGraphService.savePersonGraph(person,"WO_98_Discovery_A");
         }
+
+        personDocumentRepository.setPersonCollectionName("WO_98_Discovery_B");
+        people = IteratorUtils.toList(personDocumentRepository.findAll().iterator());
+        for (Person person:people){
+            personGraphService.savePersonGraph(person,"WO_98_Discovery_B");
+        }
+
+        String collectionName = "linker_1448473178219_1448473178239";
+        linkRepository.setCollectionName(collectionName);
+        Page<Link> page = linkRepository.findByScoreGreaterThan(0d, new PageRequest(0, 10));
+        page.forEach(link -> linkService.saveLink(link, collectionName));
+//        Link link = new Link();
+//        link.setRefA("A_tTT000000001");
+//        link.setRefB("B_tTT000000001");
+//        link.setScore(10);
+//        link.setSourceFile("linker_1448473178219_1448473178239");
+//        linkService.saveLink(link);
 
         Assert.assertEquals(4, session.query("MATCH (n:Person) RETURN count(n)", new HashMap<>()).queryResults().iterator().next().get("count(n)"));
         Assert.assertEquals(3, session.query("MATCH (n:FamilyName) RETURN count(n)", new HashMap<>()).queryResults().iterator().next().get("count(n)"));
         Assert.assertEquals(4, session.query("MATCH (n:ForeName) RETURN count(n)", new HashMap<>()).queryResults().iterator().next().get("count(n)"));
         Assert.assertEquals(2, session.query("MATCH (:Person) --> (n:FamilyName) <-- (Person) RETURN count(n)", new HashMap<>()).queryResults().iterator().next().get("count(n)"));
         Assert.assertEquals(1, session.query("MATCH (a:ForeName) <-- (n:Person) --> (b:ForeName) RETURN count(DISTINCT n)", new HashMap<>()).queryResults().iterator().next().get("count(DISTINCT n)"));
+        Assert.assertEquals(1, session.query("MATCH (a:Person) <-[b:LINK]-> (c:Person) RETURN count(DISTINCT b)", new
+                HashMap<>()).queryResults().iterator().next().get("count(DISTINCT b)"));
     }
 
 
@@ -83,7 +100,7 @@ public class TttNeo4jApplicationTests extends BaseTestClass {
         hasEvent.setEvent(event);
         person.setHasEvents(Arrays.asList(hasEvent));
 
-        personGraphService.savePersonGraph(person);
+        personGraphService.savePersonGraph(person, "unit_test");
 
         Assert.assertEquals(1, session.query("MATCH (n:Person) RETURN count(n)", new HashMap<>()).queryResults()
                 .iterator().next().get("count(n)"));
@@ -97,7 +114,6 @@ public class TttNeo4jApplicationTests extends BaseTestClass {
                 .queryResults().iterator().next().get("count(DISTINCT n)"));
     }
 
-
     public static final int MAX_ELEMENTS = 20;
     public static final int PAGE_SIZE = 10;
 //    public static final int MAX_ELEMENTS = 1000;
@@ -109,6 +125,26 @@ public class TttNeo4jApplicationTests extends BaseTestClass {
 
         PersonGraphServiceImpl.PAGE_SIZE=PAGE_SIZE;
         personGraphService.bulkSavePeopleGraphFromMongoCollection("ADM337_Discovery_eval", MAX_ELEMENTS);
+
+        final Date end = Calendar.getInstance().getTime();
+
+        final long diffSeconds = (end.getTime() - start.getTime()) / 1000 % 60;
+
+
+        logger.info("testBulkSavePeopleIntoNeo4j took " + diffSeconds + " seconds with " + PersonGraphServiceImpl.NB_THREADS + "" +
+                " thread(s)");
+
+        Assert.assertEquals(MAX_ELEMENTS, session.query("MATCH (n:Person) RETURN count(n)", new HashMap<>()).queryResults().iterator().next().get("count(n)"));
+    }
+
+//    @Test
+    public void testSaveEverything() throws InterruptedException {
+        final Date start = Calendar.getInstance().getTime();
+
+        PersonGraphServiceImpl.PAGE_SIZE=PAGE_SIZE;
+//        personGraphService.bulkSavePeopleGraphFromMongoCollection("ADM337_Discovery_eval", null);
+        personGraphService.bulkSavePeopleGraphFromMongoCollection("ADM339_Discovery_eval", null);
+        linkService.bulkSaveLinksIntoGraphFromMongoCollection("linker_1448473327663_1448473462969",null,5d);
 
         final Date end = Calendar.getInstance().getTime();
 

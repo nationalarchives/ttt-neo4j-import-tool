@@ -9,7 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import uk.gov.nationalarchives.ttt.neo4j.TestConfiguration;
+import uk.gov.nationalarchives.ttt.neo4j.dao.mongo.LinkRepository;
 import uk.gov.nationalarchives.ttt.neo4j.dao.mongo.PersonDocumentRepository;
+import uk.gov.nationalarchives.ttt.neo4j.service.LinkService;
 import uk.gov.nationalarchives.ttt.neo4j.service.PersonGraphService;
 
 import java.util.HashMap;
@@ -25,7 +27,13 @@ public abstract class BaseTestClass {
     protected PersonGraphService personGraphService;
 
     @Autowired
+    protected LinkService linkService;
+
+    @Autowired
     protected PersonDocumentRepository personDocumentRepository;
+
+    @Autowired
+    protected LinkRepository linkRepository;
 
     protected Logger logger = LoggerFactory.getLogger(getClass());
 

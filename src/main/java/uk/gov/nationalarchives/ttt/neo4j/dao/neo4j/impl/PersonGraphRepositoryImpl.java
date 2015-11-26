@@ -1,7 +1,6 @@
 package uk.gov.nationalarchives.ttt.neo4j.dao.neo4j.impl;
 
 import org.neo4j.ogm.session.Session;
-import org.neo4j.ogm.session.result.Result;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,21 +9,19 @@ import uk.gov.nationalarchives.ttt.neo4j.dao.neo4j.PersonGraphRepository;
 import uk.gov.nationalarchives.ttt.neo4j.domain.graphperson.generated.*;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 /**
  * Created by jcharlet on 16/11/15.
  */
 @Repository
-public class PersonGraphRepositoryImpl implements PersonGraphRepository {
-
-    private final Session session;
-
+public class PersonGraphRepositoryImpl extends GenericGraphRepository implements PersonGraphRepository  {
     final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
     public PersonGraphRepositoryImpl(Session session) {
-        this.session = session;
+        super(session);
     }
 
     @Override
@@ -69,7 +66,7 @@ public class PersonGraphRepositoryImpl implements PersonGraphRepository {
 
     }
 
-    private Integer mergeDay(Year year, Month month, Day day) {
+    protected Integer mergeDay(Year year, Month month, Day day) {
         Map<String, Object> nodeProperties = new HashMap<>();
         nodeProperties.put("value", day.getValue());
         nodeProperties.put("month", month.getValue());
@@ -78,7 +75,7 @@ public class PersonGraphRepositoryImpl implements PersonGraphRepository {
         return mergeNode(day.getClass().getSimpleName(), nodeProperties);
     }
 
-    private Integer mergeMonth(Year year, Month month) {
+    protected Integer mergeMonth(Year year, Month month) {
         Map<String, Object> nodeProperties = new HashMap<>();
         nodeProperties.put("value", month.getValue());
         nodeProperties.put("year", year.getValue());
@@ -86,7 +83,7 @@ public class PersonGraphRepositoryImpl implements PersonGraphRepository {
         return mergeNode(month.getClass().getSimpleName(), nodeProperties);
     }
 
-    private Integer mergeYear(Year node) {
+    protected Integer mergeYear(Year node) {
         Map<String, Object> nodeProperties = new HashMap<>();
         nodeProperties.put("value", node.getValue());
 
@@ -206,37 +203,14 @@ public class PersonGraphRepositoryImpl implements PersonGraphRepository {
     }
 
     @Override
-    public Integer createPerson(Person person) {
+    public Integer createPerson(Person person, String source) {
         Map<String, Object> personProperties = getPersonProperties(person);
+        personProperties.put("source",source);
         return createNode("Person", personProperties);
     }
 
-    private void saveRelationship(Integer startNodeId, Map<String, Object> relationshipProperties, Integer endNodeId, String relationshipLabel, String saveCommand) {
-        Map<String, Object> parameters = new HashMap<>();
-        parameters.put("startNodeId", startNodeId);
-        parameters.put("endNodeId", endNodeId);
 
-        parameters.putAll(relationshipProperties);
-
-        String cypherQuery = "MATCH (startNode), " +
-                "(endNode)" +
-                "WHERE id(startNode)={startNodeId} AND id(endNode)={endNodeId}" +
-                saveCommand;
-        cypherQuery+=" (startNode) -[:" + relationshipLabel + " { ";
-
-        for (String parameterKey : relationshipProperties.keySet()) {
-            cypherQuery += parameterKey + ":{" + parameterKey + "},";
-        }
-        cypherQuery = cypherQuery.substring(0, cypherQuery.length() - 1);
-
-        cypherQuery+="}]-> (endNode)";
-
-        session.query(
-                cypherQuery,
-                parameters);
-    }
-
-
+    //FIXME JCT to move into genericGraphRepo
     @Override
     public void createRelationship(Integer startNodeId, Map<String, Object> relationshipProperties, Integer endNodeId, String relationshipLabel) {
         saveRelationship(startNodeId, relationshipProperties, endNodeId, relationshipLabel, "CREATE");
@@ -247,36 +221,52 @@ public class PersonGraphRepositoryImpl implements PersonGraphRepository {
         session.query("MATCH (n) DETACH DELETE n", new HashMap<String,Object>());
     }
 
-    private void mergeRelationship(Integer startNodeId, Map<String, Object> relationshipProperties, Integer endNodeId, String relationshipLabel) {
-        saveRelationship(startNodeId, relationshipProperties, endNodeId, relationshipLabel, "MERGE");
-    }
-
-    private Integer getSingleNodeIdFromQueryResults(Result creationResult) {
-        return (Integer) creationResult.queryResults().iterator().next().get("ID(n)");
-    }
-
-    private Integer mergeNode(final String nodeType, Map<String, Object> nodeProperties) {
-        String saveType = "MERGE";
-        return saveNode(nodeType, nodeProperties, saveType);
-    }
-
-    private Integer createNode(final String nodeType, Map<String, Object> nodeProperties) {
-        String saveType = "CREATE";
-        return saveNode(nodeType, nodeProperties, saveType);
-    }
-
-    private Integer saveNode(String nodeType, Map<String, Object> nodeProperties, String saveType) {
-        String cypherQuery = saveType + " (n:" + nodeType + " { ";
-        for (String parameterKey : nodeProperties.keySet()) {
-            cypherQuery += parameterKey + ":{" + parameterKey + "},";
+    @Override
+    public Integer findPersonByRef(String ref) {
+        HashMap<String, Object> parameters = new HashMap<>();
+        parameters.put("ref", ref);
+        Iterator<Map<String, Object>> resultsIterator = session.query("MATCH (n:Person) WHERE n.ref={ref} RETURN ID(n)", parameters)
+                .queryResults().iterator();
+        if (resultsIterator.hasNext()){
+            return (Integer) resultsIterator.next().get("ID(n)");
         }
-        cypherQuery = cypherQuery.substring(0, cypherQuery.length() - 1);
-        cypherQuery += "}) RETURN ID(n)";
+        return null;
+    }
 
-        final Result saveResult = session.query(
-                cypherQuery,
-                nodeProperties);
-        return getSingleNodeIdFromQueryResults(saveResult);
+    @Override
+    public void removePeopleFromSource(String source) {
+        HashMap<String, Object> parameters = new HashMap<>();
+        parameters.put("source",source);
+        session.query("MATCH (n:Person) WHERE n.source={source} DETACH DELETE n", parameters);
+    }
+
+    @Override
+    public void removeReferencesWithoutRelationshipToPerson() {
+        removeNodesWithoutRelationshipTo(Reference.class.getSimpleName(), Person.class.getSimpleName());
+    }
+
+    private void removeNodesWithoutRelationshipTo(String sourceLabel, String targetLabel) {
+        session.query("MATCH (n:"+sourceLabel+") WHERE NOT (n)--(:"+targetLabel+") DETACH DELETE n", new HashMap<>());
+    }
+
+    @Override
+    public void removeForeNamesWithoutRelationshipToPerson() {
+        removeNodesWithoutRelationshipTo(ForeName.class.getSimpleName(), Person.class.getSimpleName());
+    }
+
+    @Override
+    public void removeFamilyNamesWithoutRelationshipToPerson() {
+        removeNodesWithoutRelationshipTo(FamilyName.class.getSimpleName(), Person.class.getSimpleName());
+    }
+
+    @Override
+    public void removeEventsWithoutRelationshipToPerson() {
+        removeNodesWithoutRelationshipTo(Event.class.getSimpleName(), Person.class.getSimpleName());
+    }
+
+    @Override
+    public void removeDocumentsWithoutRelationshipToPerson() {
+        removeNodesWithoutRelationshipTo(Document.class.getSimpleName(), Person.class.getSimpleName());
     }
 
     private Map<String, Object> getPersonProperties(Person person) {

@@ -23,13 +23,14 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @EnableTransactionManagement
 public class TTTNeo4jConfiguration extends Neo4jConfiguration {
 
-    public static final String HOST = "http://localhost:7474";
+    public static final String HOST = "http://localhost:8990";
+    public static final String PORT = "7474";
     public static final String USER = "neo4j";
-    public static final String PASSWORD = "jcharlet";
+    public static final String PASSWORD = "ttt";
 
     @Bean
     public Neo4jServer neo4jServer() {
-        return new RemoteServer(HOST, USER, PASSWORD);
+        return new RemoteServer(HOST+":"+PORT, USER, PASSWORD);
     }
 
     @Bean

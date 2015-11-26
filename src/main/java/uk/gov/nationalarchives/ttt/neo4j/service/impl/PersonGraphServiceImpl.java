@@ -20,7 +20,6 @@ import uk.gov.nationalarchives.ttt.neo4j.service.async.PersonCentralisedBrowser;
 import java.util.HashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -37,18 +36,20 @@ public class PersonGraphServiceImpl implements PersonGraphService {
 
 
     private final SessionFactory sessionFactory;
+    private final ExecutorService executorService;
 
     @Autowired
-    public PersonGraphServiceImpl(PersonGraphRepository personGraphRepository, PersonDocumentRepository personDocumentRepository, SessionFactory sessionFactory) {
+    public PersonGraphServiceImpl(PersonGraphRepository personGraphRepository, PersonDocumentRepository personDocumentRepository, SessionFactory sessionFactory, ExecutorService executorService) {
         this.personGraphRepository = personGraphRepository;
         this.personDocumentRepository = personDocumentRepository;
         this.sessionFactory = sessionFactory;
+        this.executorService = executorService;
     }
 
     @Override
     @Transactional
-    public void savePersonGraph(Person person) {
-        Integer personOutputId = personGraphRepository.createPerson(person);
+    public void savePersonGraph(Person person, String source) {
+        Integer personOutputId = personGraphRepository.createPerson(person, source);
 
 
         if (!CollectionUtils.isEmpty(person.getHasFamilyNames())) {
@@ -139,14 +140,13 @@ public class PersonGraphServiceImpl implements PersonGraphService {
         PersonCentralisedBrowser personCentralisedBrowser = new PersonCentralisedBrowser(limit, PAGE_SIZE, personDocumentRepository);
 
 
-        ExecutorService executorService = Executors.newFixedThreadPool(NB_THREADS);
         ConcurrentLinkedQueue<Future<?>> tasks = new ConcurrentLinkedQueue<>();
         for (int i = 0; i < NB_THREADS; i++) {
             Session session = sessionFactory.openSession(TTTNeo4jConfiguration.HOST,TTTNeo4jConfiguration.USER,
                     TTTNeo4jConfiguration.PASSWORD);
 
             tasks.add(executorService.submit(new BulkSavePeopleTask(personCentralisedBrowser, new PersonGraphServiceImpl(new
-                    PersonGraphRepositoryImpl(session), personDocumentRepository, sessionFactory))));
+                    PersonGraphRepositoryImpl(session), personDocumentRepository, sessionFactory, executorService), personCollectionName)));
         }
 
 
@@ -164,13 +164,21 @@ public class PersonGraphServiceImpl implements PersonGraphService {
                 }
             });
         }
-
-        executorService.shutdown();
+        logger.info("bulkSavePeople completed");
     }
 
     @Override
     public void emptyGraphDatabase() {
         personGraphRepository.emptyGraphDatabase();
+    }
 
+
+    void removePeopleFromSource(String source){
+        personGraphRepository.removePeopleFromSource(source);
+        personGraphRepository.removeReferencesWithoutRelationshipToPerson();
+        personGraphRepository.removeForeNamesWithoutRelationshipToPerson();
+        personGraphRepository.removeFamilyNamesWithoutRelationshipToPerson();
+        personGraphRepository.removeEventsWithoutRelationshipToPerson();
+        personGraphRepository.removeDocumentsWithoutRelationshipToPerson();
     }
 }

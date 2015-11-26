@@ -8,9 +8,11 @@ import uk.gov.nationalarchives.ttt.neo4j.domain.graphperson.generated.Person;
  */
 public interface PersonGraphService {
     @Transactional
-    void savePersonGraph(Person person);
+    void savePersonGraph(Person person, String source);
 
     void bulkSavePeopleGraphFromMongoCollection(String personCollectionName, Integer limit);
 
     void emptyGraphDatabase();
+
+//    void removePeopleFromCollection(String collectionName);
 }

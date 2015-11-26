@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
+import uk.gov.nationalarchives.ttt.neo4j.service.LinkService;
 import uk.gov.nationalarchives.ttt.neo4j.service.PersonGraphService;
 
 import java.util.Arrays;
@@ -18,21 +19,25 @@ import java.util.Arrays;
 public class TTTNeo4jCommandLineInterface implements CommandLineRunner {
 
     final private Logger logger = LoggerFactory.getLogger(getClass());
-
     final private PersonGraphService personGraphService;
+    final private LinkService linkService;
+
     public static final String OPTION_HELP = "help";
-
-
     private static final String OPTION_LIMIT = "limit";
+    private static final String OPTION_SCORE_THRESHOLD = "scoreThreshold";
+
+
     public static final String OPTION_SAVE_PEOPLE = "savePeople";
+    public static final String OPTION_REMOVE_PEOPLE = "removePeople";
     public static final String OPTION_COLLECTION_NAME = "collectionName";
     public static final String OPTION_SAVE_LINKS = "saveLinks";
     public static final String OPTION_REMOVE_LINKS = "removeLinks";
     public static final String OPTION_EMPTY_GRAPH_DB = "emptyGraphDb";
 
     @Autowired
-    public TTTNeo4jCommandLineInterface(PersonGraphService personGraphService) {
+    public TTTNeo4jCommandLineInterface(PersonGraphService personGraphService, LinkService linkService) {
         this.personGraphService = personGraphService;
+        this.linkService = linkService;
     }
 
     @Override
@@ -45,9 +50,12 @@ public class TTTNeo4jCommandLineInterface implements CommandLineRunner {
                 acceptsAll(Arrays.asList("l", OPTION_LIMIT), "limit for saving person collection into graph")
                         .withRequiredArg()
                         .ofType(Integer.class);
-                acceptsAll(Arrays.asList("s", OPTION_SAVE_PEOPLE), "save Person collection into graph");
+                acceptsAll(Arrays.asList("t", OPTION_SCORE_THRESHOLD), "score threshold for saving links")
+                        .withRequiredArg()
+                        .ofType(Double.class).defaultsTo(0d);
+                acceptsAll(Arrays.asList("p", OPTION_SAVE_PEOPLE), "save Person collection into graph");
                 acceptsAll(Arrays.asList("e", OPTION_EMPTY_GRAPH_DB), "empty graph db");
-//                acceptsAll(Arrays.asList("sl", OPTION_SAVE_LINKS), "save links from linker collection");
+                acceptsAll(Arrays.asList("l", OPTION_SAVE_LINKS), "save links from linker collection");
 //                acceptsAll(Arrays.asList("rl", OPTION_REMOVE_LINKS), "remove links from linker collection");
                 accepts(OPTION_HELP).forHelp();
             }
@@ -61,12 +69,9 @@ public class TTTNeo4jCommandLineInterface implements CommandLineRunner {
         }
 
 
-        String collectionName;
+        String collectionName=null;
         if (optionSet.has(OPTION_COLLECTION_NAME)) {
             collectionName = (String) optionSet.valueOf(OPTION_COLLECTION_NAME);
-        }else{
-            commandLineInterfaceOptionParser.printHelpOn(System.out);
-            return;
         }
 
         Integer limit=null;
@@ -74,20 +79,35 @@ public class TTTNeo4jCommandLineInterface implements CommandLineRunner {
             limit = (Integer) optionSet.valueOf(OPTION_LIMIT);
         }
 
+
+        Double scoreThreshold=null;
+        if (optionSet.has(OPTION_SCORE_THRESHOLD)) {
+            scoreThreshold = (Double) optionSet.valueOf(OPTION_SCORE_THRESHOLD);
+        }else{
+            scoreThreshold=0d;
+        }
+
         if (optionSet.has(OPTION_EMPTY_GRAPH_DB)){
+            logger.info("emptyGraphDatabase");
             personGraphService.emptyGraphDatabase();
         }
 
-        if (optionSet.has(OPTION_SAVE_PEOPLE)){
+        if (optionSet.has(OPTION_SAVE_PEOPLE)) {
+            if (collectionName==null){
+                commandLineInterfaceOptionParser.printHelpOn(System.out);
+                return;
+            }
             personGraphService.bulkSavePeopleGraphFromMongoCollection(collectionName, limit);
+        }else if (optionSet.has(OPTION_REMOVE_PEOPLE)) {
+//                personGraphService.removePeopleFromCollection(collectionName);
         }else if (optionSet.has(OPTION_SAVE_LINKS)){
-            logger.warn("NOT IMPLEMENTED YET");
+            Long longLimit=null;
+            if(limit!=null){
+                longLimit = Long.valueOf(limit);
+            }
+            linkService.bulkSaveLinksIntoGraphFromMongoCollection(collectionName, longLimit,scoreThreshold);
         }else if (optionSet.has(OPTION_REMOVE_LINKS)){
             logger.warn("NOT IMPLEMENTED YET");
         }
-
-
-
-
     }
 }

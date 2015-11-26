@@ -12,7 +12,7 @@ import java.util.Map;
 public interface PersonGraphRepository {
     Integer mergeDateNodesAndTheirSubRelationships(Year year, Month month, Day day);
 
-    Integer createPerson(Person person);
+    Integer createPerson(Person person, String source);
 
     Integer mergeFamilyName(FamilyName familyName);
 
@@ -35,4 +35,18 @@ public interface PersonGraphRepository {
     void createRelationship(Integer startNodeId, Map<String, Object> relationshipProperties, Integer endNodeId, String relationshipLabel);
 
     void emptyGraphDatabase();
+
+    Integer findPersonByRef(String refA);
+
+    void removePeopleFromSource(String source);
+
+    void removeReferencesWithoutRelationshipToPerson();
+
+    void removeForeNamesWithoutRelationshipToPerson();
+
+    void removeFamilyNamesWithoutRelationshipToPerson();
+
+    void removeEventsWithoutRelationshipToPerson();
+
+    void removeDocumentsWithoutRelationshipToPerson();
 }
