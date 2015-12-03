@@ -143,7 +143,7 @@ public class PersonGraphRepositoryImpl extends GenericGraphRepository implements
             nodeProperties.put("type", node.getType());
         }
         if (node.getRef() != null) {
-            nodeProperties.put("genre", node.getRef());
+            nodeProperties.put("ref", node.getRef());
         }
 
         return mergeNode(node.getClass().getSimpleName(), nodeProperties);
@@ -157,7 +157,7 @@ public class PersonGraphRepositoryImpl extends GenericGraphRepository implements
             nodeProperties.put("type", node.getType());
         }
         if (node.getRef() != null) {
-            nodeProperties.put("genre", node.getRef());
+            nodeProperties.put("ref", node.getRef());
         }
         if (node.getURL() != null) {
             nodeProperties.put("URL", node.getURL());
