@@ -1,0 +1,1 @@
+[{"_id":{"$oid":"5673d74ccba5504a5e21f581"},"refA":"A_tTT000000001","refB":"B_tTT000000001","score":3.7096777381755195,"scoreDetails":{"scoreOnDateOfBirth":2.7952734439247124,"scoreOnFamilyNames":0.5563024892624123,"scoreOnForeNames":0.10000000149011612,"scoreOnServiceReference":0.2581018034982786}}]

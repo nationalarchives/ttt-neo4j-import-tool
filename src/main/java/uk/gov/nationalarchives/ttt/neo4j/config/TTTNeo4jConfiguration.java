@@ -10,6 +10,7 @@ package uk.gov.nationalarchives.ttt.neo4j.config;
 
 import org.neo4j.ogm.session.Session;
 import org.neo4j.ogm.session.SessionFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.neo4j.config.Neo4jConfiguration;
@@ -23,14 +24,15 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @EnableTransactionManagement
 public class TTTNeo4jConfiguration extends Neo4jConfiguration {
 
-    public static final String HOST = "http://localhost:8990";
-    public static final String PORT = "7474";
-    public static final String USER = "neo4j";
-    public static final String PASSWORD = "ttt";
+    @Autowired
+    Neo4jProperties neo4jProperties;
 
     @Bean
     public Neo4jServer neo4jServer() {
-        return new RemoteServer(HOST+":"+PORT, USER, PASSWORD);
+        return new RemoteServer(
+                neo4jProperties.getHost()+":"+neo4jProperties.getPort(),
+                neo4jProperties.getUser(),
+                neo4jProperties.getPassword());
     }
 
     @Bean

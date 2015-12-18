@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import uk.gov.nationalarchives.ttt.neo4j.config.TTTNeo4jConfiguration;
+import uk.gov.nationalarchives.ttt.neo4j.config.Neo4jProperties;
 import uk.gov.nationalarchives.ttt.neo4j.dao.mongo.PersonDocumentRepository;
 import uk.gov.nationalarchives.ttt.neo4j.dao.neo4j.PersonGraphRepository;
 import uk.gov.nationalarchives.ttt.neo4j.dao.neo4j.impl.PersonGraphRepositoryImpl;
@@ -37,13 +37,17 @@ public class PersonGraphServiceImpl implements PersonGraphService {
 
     private final SessionFactory sessionFactory;
     private final ExecutorService executorService;
+    private final Neo4jProperties neo4jProperties;
 
     @Autowired
-    public PersonGraphServiceImpl(PersonGraphRepository personGraphRepository, PersonDocumentRepository personDocumentRepository, SessionFactory sessionFactory, ExecutorService executorService) {
+    public PersonGraphServiceImpl(PersonGraphRepository personGraphRepository, PersonDocumentRepository
+            personDocumentRepository, SessionFactory sessionFactory, ExecutorService executorService, Neo4jProperties
+             neo4jProperties) {
         this.personGraphRepository = personGraphRepository;
         this.personDocumentRepository = personDocumentRepository;
         this.sessionFactory = sessionFactory;
         this.executorService = executorService;
+        this.neo4jProperties = neo4jProperties;
     }
 
     @Override
@@ -142,11 +146,14 @@ public class PersonGraphServiceImpl implements PersonGraphService {
 
         ConcurrentLinkedQueue<Future<?>> tasks = new ConcurrentLinkedQueue<>();
         for (int i = 0; i < NB_THREADS; i++) {
-            Session session = sessionFactory.openSession(TTTNeo4jConfiguration.HOST,TTTNeo4jConfiguration.USER,
-                    TTTNeo4jConfiguration.PASSWORD);
+            Session session = sessionFactory.openSession(
+                    neo4jProperties.getHost()+":"+neo4jProperties.getPort(),
+                    neo4jProperties.getUser(),
+                    neo4jProperties.getPassword());
 
             tasks.add(executorService.submit(new BulkSavePeopleTask(personCentralisedBrowser, new PersonGraphServiceImpl(new
-                    PersonGraphRepositoryImpl(session), personDocumentRepository, sessionFactory, executorService), personCollectionName)));
+                    PersonGraphRepositoryImpl(session), personDocumentRepository, sessionFactory, executorService,
+                    neo4jProperties), personCollectionName)));
         }
 
 

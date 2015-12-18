@@ -23,6 +23,9 @@ public class TttNeo4jApplicationTests extends BaseTestClass {
 
     @Test
     public void testSavePeopleAndLinksFromMongoIntoNeo4j() {
+        importMongoCollectionIfMissing("WO_98_Discovery_A", "/mongo/WO_98_Discovery_A.json");
+        importMongoCollectionIfMissing("WO_98_Discovery_B", "/mongo/WO_98_Discovery_B.json");
+        importMongoCollectionIfMissing("link_WO98A_WO98B", "/mongo/link_WO98A_WO98B.json");
 
         personDocumentRepository.setPersonCollectionName("WO_98_Discovery_A");
         List<MongoPerson> people = IteratorUtils.toList(personDocumentRepository.findAll().iterator());
@@ -36,7 +39,7 @@ public class TttNeo4jApplicationTests extends BaseTestClass {
             personGraphService.savePersonGraph(person,"WO_98_Discovery_B");
         }
 
-        String collectionName = "linker_1448473178219_1448473178239";
+        String collectionName = "link_WO98A_WO98B";
         linkRepository.setCollectionName(collectionName);
         Page<Link> page = linkRepository.findByScoreGreaterThan(0d, new PageRequest(0, 10));
         page.forEach(link -> linkService.saveLink(link, collectionName));
@@ -121,30 +124,11 @@ public class TttNeo4jApplicationTests extends BaseTestClass {
 
     @Test
     public void testBulkSavePeopleIntoNeo4j() throws InterruptedException {
+        importMongoCollectionIfMissing("ADM337_Discovery_eval", "/mongo/ADM337_Discovery_eval.json");
         final Date start = Calendar.getInstance().getTime();
 
         PersonGraphServiceImpl.PAGE_SIZE=PAGE_SIZE;
         personGraphService.bulkSavePeopleGraphFromMongoCollection("ADM337_Discovery_eval", MAX_ELEMENTS);
-
-        final Date end = Calendar.getInstance().getTime();
-
-        final long diffSeconds = (end.getTime() - start.getTime()) / 1000 % 60;
-
-
-        logger.info("testBulkSavePeopleIntoNeo4j took " + diffSeconds + " seconds with " + PersonGraphServiceImpl.NB_THREADS + "" +
-                " thread(s)");
-
-        Assert.assertEquals(MAX_ELEMENTS, session.query("MATCH (n:Person) RETURN count(n)", new HashMap<>()).queryResults().iterator().next().get("count(n)"));
-    }
-
-//    @Test
-    public void testSaveEverything() throws InterruptedException {
-        final Date start = Calendar.getInstance().getTime();
-
-        PersonGraphServiceImpl.PAGE_SIZE=PAGE_SIZE;
-//        personGraphService.bulkSavePeopleGraphFromMongoCollection("ADM337_Discovery_eval", null);
-        personGraphService.bulkSavePeopleGraphFromMongoCollection("ADM339_Discovery_eval", null);
-        linkService.bulkSaveLinksIntoGraphFromMongoCollection("linker_1448473327663_1448473462969",null,5d);
 
         final Date end = Calendar.getInstance().getTime();
 
