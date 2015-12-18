@@ -28,7 +28,7 @@ public class Link implements Comparable<Link>{
     private ScoreDetails scoreDetails = new ScoreDetails();
 
     @Transient
-    private String sourceFile;
+    private String source;
 
     public class ScoreDetails{
         private Double scoreOnForeNames;
@@ -159,11 +159,11 @@ public class Link implements Comparable<Link>{
         this.scoreDetails = scoreDetails;
     }
 
-    public String getSourceFile() {
-        return sourceFile;
+    public String getSource() {
+        return source;
     }
 
-    public void setSourceFile(String sourceFile) {
-        this.sourceFile = sourceFile;
+    public void setSource(String source) {
+        this.source = source;
     }
 }

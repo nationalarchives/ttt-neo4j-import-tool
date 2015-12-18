@@ -33,8 +33,8 @@ public class LinkServiceImpl implements LinkService {
 
 //    @Override
     @Override
-    public void saveLink(Link link, String sourceFile) {
-        link.setSourceFile(sourceFile);
+    public void saveLink(Link link, String source) {
+        link.setSource(source);
 
         Integer personAId = personGraphRepository.findPersonByRef(link.getRefA());
         Integer personBId = personGraphRepository.findPersonByRef(link.getRefB());

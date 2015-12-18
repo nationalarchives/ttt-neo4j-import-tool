@@ -27,7 +27,7 @@ public class LinkGraphRepositoryImpl extends GenericGraphRepository implements L
     public void mergeRelationshipBetweenPeople(Integer personAId, Link link, Integer personBId) {
         Map<String, Object> relationshipProperties = new HashMap<>();
         relationshipProperties.put("score",link.getScore());
-        relationshipProperties.put("sourceFile",link.getSourceFile());
+        relationshipProperties.put("source",link.getSource());
         mergeBothWaysRelationship(personAId, relationshipProperties, personBId, "LINK");
     }
 

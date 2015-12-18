@@ -47,7 +47,7 @@ public class TttNeo4jApplicationTests extends BaseTestClass {
 //        link.setRefA("A_tTT000000001");
 //        link.setRefB("B_tTT000000001");
 //        link.setScore(10);
-//        link.setSourceFile("linker_1448473178219_1448473178239");
+//        link.setSource("linker_1448473178219_1448473178239");
 //        linkService.saveLink(link);
 
         Assert.assertEquals(4, session.query("MATCH (n:Person) RETURN count(n)", new HashMap<>()).queryResults().iterator().next().get("count(n)"));
