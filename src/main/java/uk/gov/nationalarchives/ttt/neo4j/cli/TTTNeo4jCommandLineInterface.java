@@ -56,7 +56,8 @@ public class TTTNeo4jCommandLineInterface implements CommandLineRunner {
                 acceptsAll(Arrays.asList("p", OPTION_SAVE_PEOPLE), "save Person collection into graph");
                 acceptsAll(Arrays.asList("e", OPTION_EMPTY_GRAPH_DB), "empty graph db");
                 acceptsAll(Arrays.asList("l", OPTION_SAVE_LINKS), "save links from linker collection");
-//                acceptsAll(Arrays.asList("rl", OPTION_REMOVE_LINKS), "remove links from linker collection");
+                acceptsAll(Arrays.asList("rp", OPTION_REMOVE_PEOPLE), "remove people from people collection");
+                acceptsAll(Arrays.asList("rl", OPTION_REMOVE_LINKS), "remove links from linker collection");
                 accepts(OPTION_HELP).forHelp();
             }
         };
@@ -99,7 +100,7 @@ public class TTTNeo4jCommandLineInterface implements CommandLineRunner {
             }
             personGraphService.bulkSavePeopleGraphFromMongoCollection(collectionName, limit);
         }else if (optionSet.has(OPTION_REMOVE_PEOPLE)) {
-//                personGraphService.removePeopleFromCollection(collectionName);
+            personGraphService.removePeopleFromSource(collectionName);
         }else if (optionSet.has(OPTION_SAVE_LINKS)){
             Long longLimit=null;
             if(limit!=null){
@@ -107,7 +108,7 @@ public class TTTNeo4jCommandLineInterface implements CommandLineRunner {
             }
             linkService.bulkSaveLinksIntoGraphFromMongoCollection(collectionName, longLimit,scoreThreshold);
         }else if (optionSet.has(OPTION_REMOVE_LINKS)){
-            logger.warn("NOT IMPLEMENTED YET");
+            linkService.removeLinksFromSource(collectionName);
         }
     }
 }

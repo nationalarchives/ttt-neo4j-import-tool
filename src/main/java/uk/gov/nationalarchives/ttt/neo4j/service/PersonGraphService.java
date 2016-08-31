@@ -14,5 +14,5 @@ public interface PersonGraphService {
 
     void emptyGraphDatabase();
 
-//    void removePeopleFromCollection(String collectionName);
+    void removePeopleFromSource(String peopleCollectionName);
 }

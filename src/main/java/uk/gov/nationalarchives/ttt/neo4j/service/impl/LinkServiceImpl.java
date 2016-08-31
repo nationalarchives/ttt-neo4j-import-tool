@@ -77,4 +77,9 @@ public class LinkServiceImpl implements LinkService {
 
     }
 
+    @Override
+    public void removeLinksFromSource(String linksCollectionName) {
+        linkGraphRepository.removeLinksFromSource(linksCollectionName);
+    }
+
 }

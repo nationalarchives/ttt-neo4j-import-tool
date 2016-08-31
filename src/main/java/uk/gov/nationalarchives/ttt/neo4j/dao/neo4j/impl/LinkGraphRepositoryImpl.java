@@ -31,5 +31,12 @@ public class LinkGraphRepositoryImpl extends GenericGraphRepository implements L
         mergeBothWaysRelationship(personAId, relationshipProperties, personBId, "LINK");
     }
 
+    @Override
+    public void removeLinksFromSource(String linksCollectionName) {
+        HashMap<String, Object> parameters = new HashMap<>();
+        parameters.put("source",linksCollectionName);
+        session.query("MATCH  (:Person)-[n:LINK]-(:Person) WHERE n.source={source} DETACH DELETE n", parameters);
+    }
+
 
 }

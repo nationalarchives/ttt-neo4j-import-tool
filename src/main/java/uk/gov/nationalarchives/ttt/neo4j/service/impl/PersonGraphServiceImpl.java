@@ -179,13 +179,14 @@ public class PersonGraphServiceImpl implements PersonGraphService {
         personGraphRepository.emptyGraphDatabase();
     }
 
-
-    void removePeopleFromSource(String source){
-        personGraphRepository.removePeopleFromSource(source);
+    @Override
+    public void removePeopleFromSource(String peopleCollectionName) {
+        personGraphRepository.removePeopleFromSource(peopleCollectionName);
         personGraphRepository.removeReferencesWithoutRelationshipToPerson();
         personGraphRepository.removeForeNamesWithoutRelationshipToPerson();
         personGraphRepository.removeFamilyNamesWithoutRelationshipToPerson();
         personGraphRepository.removeEventsWithoutRelationshipToPerson();
         personGraphRepository.removeDocumentsWithoutRelationshipToPerson();
     }
+
 }

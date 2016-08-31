@@ -9,4 +9,6 @@ import uk.gov.nationalarchives.ttt.neo4j.domain.Link;
 public interface LinkGraphRepository {
 
     void mergeRelationshipBetweenPeople(Integer personAId, Link link, Integer personBId);
+
+    void removeLinksFromSource(String linksCollectionName);
 }
